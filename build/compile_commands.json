@@ -1,0 +1,32 @@
+[
+  {
+    "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
+    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o' -c ../src/cliente.cpp",
+    "file": "../src/cliente.cpp",
+    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o"
+  },
+  {
+    "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
+    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o' -c ../src/servidor.cpp",
+    "file": "../src/servidor.cpp",
+    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o"
+  },
+  {
+    "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
+    "command": "c++ -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include -MD -MQ test_servidor.p/tests_test_servidor.cpp.o -MF test_servidor.p/tests_test_servidor.cpp.o.d -o test_servidor.p/tests_test_servidor.cpp.o -c ../tests/test_servidor.cpp",
+    "file": "../tests/test_servidor.cpp",
+    "output": "test_servidor.p/tests_test_servidor.cpp.o"
+  },
+  {
+    "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
+    "command": "c++ -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include -MD -MQ test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o -MF test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o.d -o test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o -c ../subprojects/googletest-1.15.0/googletest/src/gtest-all.cc",
+    "file": "../subprojects/googletest-1.15.0/googletest/src/gtest-all.cc",
+    "output": "test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o"
+  },
+  {
+    "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
+    "command": "c++ -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include -MD -MQ test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o -MF test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o.d -o test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o -c ../subprojects/googletest-1.15.0/googletest/src/gtest_main.cc",
+    "file": "../subprojects/googletest-1.15.0/googletest/src/gtest_main.cc",
+    "output": "test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o"
+  }
+]

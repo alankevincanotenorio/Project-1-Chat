@@ -1,0 +1,1 @@
+[{"cmd": ["/home/alan/Programacion/Proyecto_1:Chat/build/test_servidor"], "env": {}, "name": "test_servidor", "workdir": null, "timeout": 30, "suite": ["Chat_cliente-servidor"], "is_parallel": true, "priority": 0, "protocol": "exitcode", "depends": ["test_servidor@exe"]}]
