@@ -38,20 +38,20 @@ build PHONY: phony
 
 # Build rules for targets
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/cliente.p/src_cliente.cpp.o: cpp_COMPILER ../src/cliente.cpp
- DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o.d
- DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o.d
- ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client.p/src_main_client.cpp.o: cpp_COMPILER ../src/main_client.cpp
+ DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d
+ DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d
+ ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/cliente: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/cliente.p/src_cliente.cpp.o
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client.p/src_main_client.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/servidor.p/src_servidor.cpp.o: cpp_COMPILER ../src/servidor.cpp
- DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o.d
- DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o.d
- ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o: cpp_COMPILER ../src/main_servidor.cpp
+ DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o.d
+ DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o.d
+ ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/servidor: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/servidor.p/src_servidor.cpp.o
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
 build test_servidor.p/tests_test_servidor.cpp.o: cpp_COMPILER ../tests/test_servidor.cpp
@@ -124,7 +124,7 @@ build meson-internal__uninstall: CUSTOM_COMMAND PHONY
  COMMAND = /usr/bin/meson --internal uninstall
  pool = console
 
-build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Programacion/Proyecto_1$:Chat/build/bin/cliente /home/alan/Programacion/Proyecto_1$:Chat/build/bin/servidor test_servidor
+build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor test_servidor
 
 build meson-test-prereq: phony test_servidor
 

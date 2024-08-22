@@ -1,15 +1,15 @@
 [
   {
     "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
-    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o' -c ../src/cliente.cpp",
-    "file": "../src/cliente.cpp",
-    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/cliente.p/src_cliente.cpp.o"
+    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o' -c ../src/main_client.cpp",
+    "file": "../src/main_client.cpp",
+    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o"
   },
   {
     "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
-    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o' -c ../src/servidor.cpp",
-    "file": "../src/servidor.cpp",
-    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/servidor.p/src_servidor.cpp.o"
+    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o' -c ../src/main_servidor.cpp",
+    "file": "../src/main_servidor.cpp",
+    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o"
   },
   {
     "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
