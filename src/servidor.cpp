@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <thread>
 #include <cstring>
+#include "../libs/json.hpp"
+using json = nlohmann::json;
 
 using namespace std;
 
