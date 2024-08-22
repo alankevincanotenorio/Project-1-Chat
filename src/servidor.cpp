@@ -65,6 +65,10 @@ public:
         socket_open = true;
     }
 
+    void connect_server(){
+        
+    }
+
     //metodo destructor del objeto
     ~servidor() {
         if (socket_open) {
@@ -87,4 +91,9 @@ public:
     bool getSocket_open() const {
         return socket_open;
     }
+
+    string getUsername() {
+        return "Usuario";
+    }
+
 };

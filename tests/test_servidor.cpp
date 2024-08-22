@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../src/servidor.cpp"
+#include "../src/cliente.cpp"
 
 //test para probar el constructor del servidor
 TEST(ServidorTest, ConstructorInit){
@@ -18,3 +19,13 @@ TEST(ServidorTest, CreateSocket){
 
 
 //test para el deconstructor pendiente
+TEST(ServidorTest, UserRegister) {
+    unique_ptr<servidor> server = make_unique<servidor>(8080);
+    unique_ptr<cliente> client = make_unique<cliente>("127.0.0.1", 8080);
+    
+    server->connect_server();
+    client->connect_client();
+    
+    // Supongamos que "Juan" es el nombre de usuario que esperas después de la conexión
+    EXPECT_EQ(server->getUsername(), "Juan");
+}
