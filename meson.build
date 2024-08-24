@@ -12,10 +12,10 @@ gtest_main_dep = dependency('gtest_main', required: true)
 # Crear los ejecutables en la carpeta 'bin'
 #cliente_executable = executable(bin_dir / 'cliente', src_dir / 'cliente.cpp')
 main_cliente_executable = executable(bin_dir / 'main_cliente', src_dir / 'main_cliente.cpp')
-main_servidor_executable = executable(bin_dir / 'main_servidor', src_dir / 'main_servidor.cpp')
+main_server_executable = executable(bin_dir / 'main_server', src_dir / 'main_server.cpp')
 
 # Test
-test_executable = executable('test_servidor', tests_dir / 'test_servidor.cpp',
+test_executable = executable('test_server', tests_dir / 'test_server.cpp',
   dependencies: [gtest_dep, gtest_main_dep],
   install: false,
   override_options: ['cpp_std=c++17'])

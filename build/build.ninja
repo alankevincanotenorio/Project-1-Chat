@@ -46,30 +46,30 @@ build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_cliente.p/src_main
 build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_cliente: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_cliente.p/src_main_cliente.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o: cpp_COMPILER ../src/main_servidor.cpp
- DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o.d
- DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o.d
- ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server.p/src_main_server.cpp.o: cpp_COMPILER ../src/main_server.cpp
+ DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p/src_main_server.cpp.o.d
+ DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p/src_main_server.cpp.o.d
+ ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor.p/src_main_servidor.cpp.o
+build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server.p/src_main_server.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
-build test_servidor.p/tests_test_servidor.cpp.o: cpp_COMPILER ../tests/test_servidor.cpp
- DEPFILE = test_servidor.p/tests_test_servidor.cpp.o.d
- DEPFILE_UNQUOTED = test_servidor.p/tests_test_servidor.cpp.o.d
- ARGS = -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
+build test_server.p/tests_test_server.cpp.o: cpp_COMPILER ../tests/test_server.cpp
+ DEPFILE = test_server.p/tests_test_server.cpp.o.d
+ DEPFILE_UNQUOTED = test_server.p/tests_test_server.cpp.o.d
+ ARGS = -Itest_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
 
-build test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o: cpp_COMPILER ../subprojects/googletest-1.15.0/googletest/src/gtest-all.cc
- DEPFILE = test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o.d
- DEPFILE_UNQUOTED = test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o.d
- ARGS = -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
+build test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o: cpp_COMPILER ../subprojects/googletest-1.15.0/googletest/src/gtest-all.cc
+ DEPFILE = test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o.d
+ DEPFILE_UNQUOTED = test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o.d
+ ARGS = -Itest_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
 
-build test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o: cpp_COMPILER ../subprojects/googletest-1.15.0/googletest/src/gtest_main.cc
- DEPFILE = test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o.d
- DEPFILE_UNQUOTED = test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o.d
- ARGS = -Itest_servidor.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
+build test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o: cpp_COMPILER ../subprojects/googletest-1.15.0/googletest/src/gtest_main.cc
+ DEPFILE = test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o.d
+ DEPFILE_UNQUOTED = test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o.d
+ ARGS = -Itest_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -std=c++17 -O0 -g -pthread -isystem../subprojects/googletest-1.15.0/googletest -isystemsubprojects/googletest-1.15.0/googletest -isystem../subprojects/googletest-1.15.0/googletest/include
 
-build test_servidor: cpp_LINKER test_servidor.p/tests_test_servidor.cpp.o test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o test_servidor.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o
+build test_server: cpp_LINKER test_server.p/tests_test_server.cpp.o test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest-all.cc.o test_server.p/subprojects_googletest-1.15.0_googletest_src_gtest_main.cc.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined -pthread
 
 # Test rules
@@ -124,9 +124,9 @@ build meson-internal__uninstall: CUSTOM_COMMAND PHONY
  COMMAND = /usr/bin/meson --internal uninstall
  pool = console
 
-build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_cliente /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_servidor test_servidor
+build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_cliente /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server test_server
 
-build meson-test-prereq: phony test_servidor
+build meson-test-prereq: phony test_server
 
 build meson-benchmark-prereq: phony 
 

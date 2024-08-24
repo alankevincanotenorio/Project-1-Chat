@@ -13,7 +13,6 @@ private:
     string server_ip;
     int server_port;
 
-
 public:
     cliente(const string &ip, int port) : server_ip(ip), server_port(port) {}
     void connect_client(){
