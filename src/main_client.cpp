@@ -1,7 +1,7 @@
-#include "cliente.cpp"
+#include "Client.cpp"
 #include <iostream>
 using namespace std;
 int main() {
-    cout<<"Hola desde el cliente"<<endl;
+    cout<<"Hello from the client"<<endl;
     return 0;
 }

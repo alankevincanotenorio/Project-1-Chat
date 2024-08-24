@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
-#include <cstring>
 #include "../libs/json.hpp"
 using json = nlohmann::json;
 using namespace std;
@@ -22,21 +21,21 @@ private:
 public:
     Server(int port) : port(port) {}
 
-    //metodo que crea e inicializa el socket
-    void init_socket() {
+        //method that creates and initializes the socket    
+        void init_socket() {
         if (socket_open) {
-            cerr << "El socket principal ya está abierto" << endl;
+            cerr << "The main socket is open" << endl;
             return;
         }
-        // Crear el socket
+        // Create socket
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd == -1) {
-            cerr << "Error al crear el socket: " << strerror(errno) << endl;
+            cerr << "Error creating socket: " << strerror(errno) << endl;
             return;
         }
         // Configurar opciones del socket
         if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
-            cerr << "Error al configurar el socket: " << strerror(errno) << endl;
+            cerr << "Error configuring socket: " << strerror(errno) << endl;
             close(server_fd);
             return;
         }
@@ -45,29 +44,30 @@ public:
         address.sin_port = htons(port);
         // Bind del socket
         if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-            cerr << "Error al usar bind: " << strerror(errno) << endl;
+            cerr << "Error using bind: " << strerror(errno) << endl;
             close(server_fd);
             return;
         }
         // Escuchar conexiones
         if (listen(server_fd, SOMAXCONN) < 0) {
-            cerr << "Error en listen: " << strerror(errno) << endl;
+            cerr << "Error listen: " << strerror(errno) << endl;
             close(server_fd);
             return;
         }
         socket_open = true;
     }
 
+    //not implemented 
     void connect_server(){
         
     }
 
-    //metodo destructor del server
+    //destructive method
     ~Server() {
         if (socket_open) {
-            cout << "Server destruido" << endl;
+            cout << "Server destroyed" << endl;
             if (close(server_fd) == -1) {
-                cerr << "Error al cerrar el socket: " << strerror(errno) << endl;
+                cerr << "Error closing socket: " << strerror(errno) << endl;
             }
         }
     }
@@ -85,9 +85,9 @@ public:
         return socket_open;
     }
 
-    //no implementado
+    //not implemented
     string getUsername() {
-        return "Usuario";
+        return "User";
     }
 
 };

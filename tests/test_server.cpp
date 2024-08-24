@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 #include "../src/Server.cpp"
-#include "../src/cliente.cpp"
+#include "../src/Client.cpp"
 
-//test para probar el constructor del Server
+//test to test the server constructor
 TEST(ServerTest, ConstructorInit){
     int expected_port = 8080;
     unique_ptr<Server> server = make_unique<Server>(expected_port);
     EXPECT_EQ(server->getPort(), expected_port);
 }
 
-//test para probar la creacion de socket
+//test to test the creation of the server
 TEST(ServerTest, CreateSocket){
     int expected_port = 8080;
     unique_ptr<Server> server = make_unique<Server>(expected_port);
@@ -17,28 +17,28 @@ TEST(ServerTest, CreateSocket){
     EXPECT_NE(server->getServer_fd(), -1);
 }
 
-//test para verificar si un usuario ha sido conectado al Server
+//test to check if a user has been connected to the Server
 TEST(ServerTest, UserConnected) {
     unique_ptr<Server> server = make_unique<Server>(8080);
-    unique_ptr<cliente> client = make_unique<cliente>("127.0.0.1", 8080);    
+    unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);    
     server->connect_server();
     client->connect_client();
     EXPECT_EQ(server->getConnectStatus(), true);
 }
 
-//test para verificar si un usuario no ha sido conectado al Server, en este caso, cuando no se registre
+//test to check if a user has not been connected to the Server, in this case, when not registered
 TEST(ServerTest, UserUnconnected) {
     unique_ptr<Server> server = make_unique<Server>(8080);
-    unique_ptr<cliente> client = make_unique<cliente>("127.0.0.1", 8080);    
+    unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);    
     server->connect_server();
     client->connect_client();
     EXPECT_NE(server->getConnectStatus(), true);
 }
 
-//test para verificar si un usuario ha sido registrado correctamente
+//test to check if a user has been registered correctly
 TEST(ServerTest, UserRegister) {
     unique_ptr<Server> server = make_unique<Server>(8080);
-    unique_ptr<cliente> client = make_unique<cliente>("127.0.0.1", 8080);    
+    unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);    
     server->connect_server();
     client->connect_client();   
     EXPECT_EQ(server->getUsername(), "Juan");

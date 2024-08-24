@@ -1,1 +1,1 @@
-{"version": "undefined", "descriptive_name": "Chat_cliente-servidor", "subproject_dir": "subprojects", "subprojects": [{"name": "gtest", "version": "1.15.0", "descriptive_name": "gtest"}]}
+{"version": "undefined", "descriptive_name": "Chat_client-server", "subproject_dir": "subprojects", "subprojects": [{"name": "gtest", "version": "1.15.0", "descriptive_name": "gtest"}]}

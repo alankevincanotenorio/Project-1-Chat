@@ -1,9 +1,9 @@
 [
   {
     "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
-    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_cliente.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_cliente.p/src_main_cliente.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_cliente.p/src_main_cliente.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_cliente.p/src_main_cliente.cpp.o' -c ../src/main_cliente.cpp",
-    "file": "../src/main_cliente.cpp",
-    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_cliente.p/src_main_cliente.cpp.o"
+    "command": "c++ -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g -MD -MQ '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o' -MF /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d -o '/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o' -c ../src/main_client.cpp",
+    "file": "../src/main_client.cpp",
+    "output": "/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o"
   },
   {
     "directory": "/home/alan/Programacion/Proyecto_1:Chat/build",
