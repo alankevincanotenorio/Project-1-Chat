@@ -22,7 +22,7 @@ public:
     Server(int port) : port(port) {}
 
         //method that creates and initializes the socket    
-        void init_socket() {
+        void initSocket() {
         if (socket_open) {
             cerr << "The main socket is open" << endl;
             return;
@@ -33,7 +33,7 @@ public:
             cerr << "Error creating socket: " << strerror(errno) << endl;
             return;
         }
-        // Configurar opciones del socket
+        // Configuring socket
         if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
             cerr << "Error configuring socket: " << strerror(errno) << endl;
             close(server_fd);
@@ -42,13 +42,13 @@ public:
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = INADDR_ANY;
         address.sin_port = htons(port);
-        // Bind del socket
+        // Bind socket
         if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
             cerr << "Error using bind: " << strerror(errno) << endl;
             close(server_fd);
             return;
         }
-        // Escuchar conexiones
+        // Listen connections
         if (listen(server_fd, SOMAXCONN) < 0) {
             cerr << "Error listen: " << strerror(errno) << endl;
             close(server_fd);
@@ -58,16 +58,18 @@ public:
     }
 
     //not implemented 
-    void connect_server(){
+    void connectClient(){
         
     }
 
     //destructive method
     ~Server() {
-        if (socket_open) {
+        if (socket_open && server_fd != -1) {
             cout << "Server destroyed" << endl;
             if (close(server_fd) == -1) {
                 cerr << "Error closing socket: " << strerror(errno) << endl;
+            } else {
+                socket_open = false; 
             }
         }
     }
@@ -90,4 +92,8 @@ public:
         return "User";
     }
 
+    //not implemented
+    bool getConnectStatus(){
+        return false;
+    }
 };

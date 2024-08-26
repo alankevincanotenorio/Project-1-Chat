@@ -2,6 +2,7 @@
 #include <iostream>
 using namespace std;
 int main() {
-    cout<<"Hello from the client"<<endl;
+    unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);
+    client->connectToServer();
     return 0;
 }

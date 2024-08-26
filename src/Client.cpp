@@ -17,7 +17,8 @@ public:
     Client(const string &ip, int port) : server_ip(ip), server_port(port) {}
 
     //not implemented yet
-    void connect_client(){
+    void connectToServer(){
         
     }
+
 };

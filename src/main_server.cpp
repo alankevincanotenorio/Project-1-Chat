@@ -3,6 +3,7 @@
 
 int main() {
     unique_ptr<Server> server = make_unique<Server>(8080);
-    server->init_socket();
+    server->initSocket();
+    server->connectClient();
     return 0;
 }
