@@ -41,7 +41,7 @@ TEST(ServerTest, UserRegister) {
     unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);    
     server->connectClient();
     client->connectToServer();  
-    EXPECT_EQ(server->getUsername(), "Juan");
+    EXPECT_EQ(server->getUserRegister(client->name), "Juan");
 }
 
 //NOT implemented yet

@@ -15,10 +15,11 @@ private:
 
 public:
     Client(const string &ip, int port) : server_ip(ip), server_port(port) {}
+    string name;
 
     //not implemented yet
     void connectToServer(){
-        
+            
     }
 
 };

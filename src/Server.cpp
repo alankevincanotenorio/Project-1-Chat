@@ -17,9 +17,11 @@ private:
     int addrlen = sizeof(address);
     int port;
     bool socket_open;
+    json users;
+    string current_name;
 
 public:
-    Server(int port) : port(port) {}
+    Server(int port) : port(port), socket_open(false){}
 
         //method that creates and initializes the socket    
         void initSocket() {
@@ -83,13 +85,13 @@ public:
         return server_fd;
     }
 
-    bool getSocket_open() const {
+    bool getSocket_open() {
         return socket_open;
     }
 
-    //not implemented
-    string getUsername() {
-        return "User";
+    string getUserRegister(string user) {
+        if(users.find(user) != users.end()) return current_name;
+        else return "NO_SUCH_USER";
     }
 
     //not implemented
