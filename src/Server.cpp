@@ -97,4 +97,8 @@ public:
     bool getConnectStatus(){
         return false;
     }
+
+    void addUser(string username){
+        users[username] = "ACTIVE";
+    }
 };
