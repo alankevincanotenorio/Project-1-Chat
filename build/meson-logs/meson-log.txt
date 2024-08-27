@@ -1,4 +1,4 @@
-Build started at 2024-08-24T09:50:29.943998
+Build started at 2024-08-26T23:32:05.550551
 Main binary: /usr/bin/python3
 Build Options: 
 Python system: Linux
@@ -34,7 +34,7 @@ This program has absolutely no warranty.
 
 linker stderr:
 collect2 version 12.2.0
-/usr/bin/ld -plugin /usr/lib/gcc/x86_64-linux-gnu/12/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/12/lto-wrapper -plugin-opt=-fresolution=/tmp/ccBJw3xu.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/12 -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/12/../../.. --version -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/12/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crtn.o
+/usr/bin/ld -plugin /usr/lib/gcc/x86_64-linux-gnu/12/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/12/lto-wrapper -plugin-opt=-fresolution=/tmp/ccBjHsep.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/12 -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/12/../../.. --version -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/12/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crtn.o
 
 Sanity testing C++ compiler: c++
 Is cross compiler: False.
@@ -73,7 +73,7 @@ This program has absolutely no warranty.
 
 linker stderr:
 collect2 version 12.2.0
-/usr/bin/ld -plugin /usr/lib/gcc/x86_64-linux-gnu/12/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/12/lto-wrapper -plugin-opt=-fresolution=/tmp/cciX9D7O.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/12 -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/12/../../.. --version -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/12/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crtn.o
+/usr/bin/ld -plugin /usr/lib/gcc/x86_64-linux-gnu/12/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/12/lto-wrapper -plugin-opt=-fresolution=/tmp/ccMgZnBZ.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/12 -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/12/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/12/../../.. --version -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/12/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/crtn.o
 
 Sanity testing C++ compiler: c++
 Is cross compiler: False.
@@ -100,8 +100,8 @@ Did not find pkg-config by name 'pkg-config'
 Found Pkg-config: NO
 Pkg-config binary for machine 1 not found. Giving up.
 Running compile:
-Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpe18mpia0
-Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpe18mpia0/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpe18mpia0/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lgtest -Wl,--end-group -Wl,--allow-shlib-undefined 
+Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpfmqb8yt5
+Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpfmqb8yt5/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpfmqb8yt5/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lgtest -Wl,--end-group -Wl,--allow-shlib-undefined 
 
 Code:
  int main(void) { return 0; }
@@ -113,8 +113,8 @@ Compiler stderr:
 collect2: error: ld returned 1 exit status
 
 Running compile:
-Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmppp3liype
-Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmppp3liype/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmppp3liype/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive 
+Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpzsi0ngid
+Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpzsi0ngid/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpzsi0ngid/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive 
 
 Code:
  #include<stdio.h>
@@ -135,8 +135,8 @@ Program stderr:
 
 
 Running compile:
-Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmp4g_eg5hj
-Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmp4g_eg5hj/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmp4g_eg5hj/output.obj -c -D_FILE_OFFSET_BITS=64 -O0 -fpermissive --print-search-dirs 
+Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpcfve0v4c
+Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpcfve0v4c/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpcfve0v4c/output.obj -c -D_FILE_OFFSET_BITS=64 -O0 -fpermissive --print-search-dirs 
 
 Code:
  
@@ -148,8 +148,8 @@ libraries: =/usr/lib/gcc/x86_64-linux-gnu/12/:/usr/lib/gcc/x86_64-linux-gnu/12/.
 Compiler stderr:
  
 Running compile:
-Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmplvz3q_eh
-Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmplvz3q_eh/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmplvz3q_eh/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lgtest_main -Wl,--end-group -Wl,--allow-shlib-undefined 
+Working directory:  /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpk9n7e4m2
+Command line:  c++ /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpk9n7e4m2/testfile.cpp -o /home/alan/Programacion/Proyecto_1:Chat/build/meson-private/tmpk9n7e4m2/output.exe -D_FILE_OFFSET_BITS=64 -O0 -fpermissive -Wl,--start-group -lgtest_main -Wl,--end-group -Wl,--allow-shlib-undefined 
 
 Code:
  int main(void) { return 0; }
@@ -198,8 +198,8 @@ Chat_client-server undefined
 
 Found ninja-1.11.1 at /usr/bin/ninja
 Running compile:
-Working directory:  /tmp/tmpxzzpsuzm
-Command line:  c++ /tmp/tmpxzzpsuzm/testfile.cpp -o /tmp/tmpxzzpsuzm/output.obj -D_FILE_OFFSET_BITS=64 -c -std=c++17 
+Working directory:  /tmp/tmpxdesqyq3
+Command line:  c++ /tmp/tmpxdesqyq3/testfile.cpp -o /tmp/tmpxdesqyq3/output.obj -D_FILE_OFFSET_BITS=64 -c -std=c++17 
 
 Code:
  int i = static_cast<int>(0);

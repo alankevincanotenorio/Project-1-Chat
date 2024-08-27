@@ -38,10 +38,15 @@ TEST(ServerTest, UserUnconnected) {
 //test to check if a user has been registered correctly
 TEST(ServerTest, UserRegister) {
     unique_ptr<Server> server = make_unique<Server>(8080);
-    unique_ptr<Client> client = make_unique<Client>("127.0.0.1", 8080);    
-    server->connectClient();
-    client->connectToServer();  
-    EXPECT_EQ(server->getUserRegister(client->name), "Juan");
+    server->addUser("Juan");
+    EXPECT_EQ(server->getUserRegister("Juan"), "Juan");
+}
+
+//test to check if a user has not been registered correctly
+TEST(ServerTest, UserUnregister) {
+    unique_ptr<Server> server = make_unique<Server>(8080);
+    server->addUser("Juan");
+    EXPECT_NE(server->getUserRegister("Pancho"), "Juan");
 }
 
 //NOT implemented yet

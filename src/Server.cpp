@@ -18,7 +18,6 @@ private:
     int port;
     bool socket_open;
     json users;
-    string current_name;
 
 public:
     Server(int port) : port(port), socket_open(false){}
@@ -90,7 +89,7 @@ public:
     }
 
     string getUserRegister(string user) {
-        if(users.find(user) != users.end()) return current_name;
+        if(users.find(user) != users.end()) return user;
         else return "NO_SUCH_USER";
     }
 
