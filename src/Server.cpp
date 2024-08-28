@@ -18,6 +18,7 @@ private:
     int port;
     bool socket_open;
     json users;
+    bool client_connected = false;
 
 public:
     Server(int port) : port(port), socket_open(false){}
@@ -60,7 +61,13 @@ public:
 
     //not implemented 
     void connectClient(){
-        
+        cout<<"Server waiting connections..."<<endl;
+        while(true){
+            int new_socket;
+            new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+            if(new_socket != -1) client_connected = true;
+            cout<<"Server waiting more connections..."<<endl;
+        }
     }
 
     //destructive method
@@ -94,8 +101,8 @@ public:
     }
 
     //not implemented
-    bool getConnectStatus(){
-        return false;
+    bool getClientConnected(){
+        return client_connected;
     }
 
     void addUser(string username){
