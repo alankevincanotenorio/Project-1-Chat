@@ -19,6 +19,7 @@ private:
     bool socket_open;
     json users;
     bool client_connected = false;
+    int connection_no = 0;
 
 public:
     Server(int port) : port(port), socket_open(false){}
@@ -59,13 +60,21 @@ public:
         socket_open = true;
     }
 
-    //not implemented 
     void connectClient(){
         cout<<"Server waiting connections..."<<endl;
         while(true){
             int new_socket;
             new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-            if(new_socket != -1) client_connected = true;
+            if(new_socket != -1){
+                client_connected = true;
+                ++connection_no;
+                string server = "Welcome user no. ";
+                server += to_string(connection_no);
+                send(new_socket, server.c_str(), server.size(), 0);
+                char buffer[1024] = {0};
+                read(new_socket, buffer, 1024);
+                cout <<"Client message: " << buffer << endl;
+            }
             cout<<"Server waiting more connections..."<<endl;
         }
     }
@@ -100,7 +109,6 @@ public:
         else return "NO_SUCH_USER";
     }
 
-    //not implemented
     bool getClientConnected(){
         return client_connected;
     }
