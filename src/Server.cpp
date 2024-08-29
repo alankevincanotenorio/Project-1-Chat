@@ -5,7 +5,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include <vector>
 #include "../libs/json.hpp"
+#include "Room.cpp"
 using json = nlohmann::json;
 using namespace std;
 
@@ -20,23 +22,23 @@ private:
     json users;
     bool client_connected = false;
     int connection_no = 0;
+    bool general_room_created = false;
+    vector<int> clients_sock;
+    vector<string> clients_names;
 
 public:
     Server(int port) : port(port), socket_open(false){}
 
-        //method that creates and initializes the socket    
-        void initSocket() {
+    void initSocket() {
         if (socket_open) {
             cerr << "The main socket is open" << endl;
             return;
         }
-        // Create socket
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd == -1) {
             cerr << "Error creating socket: " << strerror(errno) << endl;
             return;
         }
-        // Configuring socket
         if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
             cerr << "Error configuring socket: " << strerror(errno) << endl;
             close(server_fd);
@@ -45,13 +47,11 @@ public:
         address.sin_family = AF_INET;
         address.sin_addr.s_addr = INADDR_ANY;
         address.sin_port = htons(port);
-        // Bind socket
         if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
             cerr << "Error using bind: " << strerror(errno) << endl;
             close(server_fd);
             return;
         }
-        // Listen connections
         if (listen(server_fd, SOMAXCONN) < 0) {
             cerr << "Error listen: " << strerror(errno) << endl;
             close(server_fd);
@@ -60,26 +60,66 @@ public:
         socket_open = true;
     }
 
-    void connectClient(){
-        cout<<"Server waiting connections..."<<endl;
-        while(true){
-            int new_socket;
-            new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-            if(new_socket != -1){
-                client_connected = true;
+    void connectClient() {
+        cout << "Server waiting connections..." << endl;
+        while (true) {
+            int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+            if (new_socket != -1) {
                 ++connection_no;
-                string server = "Welcome user no. ";
-                server += to_string(connection_no);
-                send(new_socket, server.c_str(), server.size(), 0);
-                char buffer[1024] = {0};
-                read(new_socket, buffer, 1024);
-                cout <<"Client message: " << buffer << endl;
+                if (!general_room_created) {
+                    unique_ptr<Room> general = make_unique<Room>("General");
+                    general_room_created = true;
+                }
+                clients_sock.push_back(new_socket);
+                client_connected = true;
+                char buffer[512] = {0};
+                read(new_socket, buffer, 512);
+                string username(buffer);
+                if (getUserRegister(username) != "NO_SUCH_USER") {
+                    close(new_socket);
+                } else{
+                    addUser(username);
+                    broadcastMessage(new_socket, username + " has joined the chat.");
+                    thread clientThread(&Server::handleClient, this, new_socket, username);
+                    clientThread.detach();
+                }
             }
-            cout<<"Server waiting more connections..."<<endl;
+            cout << "Server waiting more connections..." << endl;
         }
     }
 
-    //destructive method
+    void handleClient(int client_socket, string username) {
+        string welcome_message = "Welcome, " + username + "!";
+        send(client_socket, welcome_message.c_str(), welcome_message.size(), 0);
+        char buffer[512] = {0};
+        while (true) {
+            int bytes_read = read(client_socket, buffer, 512);
+            if (bytes_read <= 0) {
+                break;
+            }
+            string message(buffer, bytes_read);
+            broadcastMessage(client_socket, username + ": " + message);
+            buffer[0] = '\0'; 
+        }
+
+        // Remover cliente al desconectar
+        auto it = find(clients_sock.begin(), clients_sock.end(), client_socket);
+        if (it != clients_sock.end()) {
+            clients_sock.erase(it);
+        }
+        
+        close(client_socket);
+        broadcastMessage(client_socket, username + " has left the chat.");
+    }
+
+    void broadcastMessage(int sender_socket, const string& message) {
+        for (int client_socket : clients_sock) {
+            if (client_socket != sender_socket) {
+                send(client_socket, message.c_str(), message.size(), 0);
+            }
+        }
+    }
+
     ~Server() {
         if (socket_open && server_fd != -1) {
             cout << "Server destroyed" << endl;
@@ -89,9 +129,11 @@ public:
                 socket_open = false; 
             }
         }
+        for (int client_socket : clients_sock) {
+            close(client_socket); // Cerrar todos los sockets de clientes
+        }
     }
 
-    // GETTERS
     int getPort() const {
         return port;
     }
@@ -105,15 +147,15 @@ public:
     }
 
     string getUserRegister(string user) {
-        if(users.find(user) != users.end()) return user;
+        if (users.find(user) != users.end()) return user;
         else return "NO_SUCH_USER";
     }
 
-    bool getClientConnected(){
+    bool getClientConnected() {
         return client_connected;
     }
 
-    void addUser(string username){
+    void addUser(string username) {
         users[username] = "ACTIVE";
     }
 };
