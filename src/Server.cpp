@@ -24,11 +24,6 @@ private:
     bool client_connected = false;
     unique_ptr<Room> generalRoom;
 
-    void sendMessage(int socket, const string& message) {
-        string msg = message + "\n"; // Add newline to delimit messages
-        send(socket, msg.c_str(), msg.size(), 0);
-    }
-
 public:
     Server(int port) : port(port), socket_open(false){}
 
@@ -61,7 +56,6 @@ public:
             return;
         }
         socket_open = true;
-            // Crear room general
         generalRoom = make_unique<Room>("General");
     }
 
@@ -75,11 +69,11 @@ public:
                 read(new_socket, buffer, 512);
                 string username(buffer);
                 if (getUserRegister(username) != "NO_SUCH_USER") {
+                    cout<<"User registered"<<endl;
                     close(new_socket);
                 } else{
                     addUser(username);
                     generalRoom->addClient(new_socket, username);
-                    sendMessage(new_socket, username + " has joined the chat.");
                     thread clientThread(&Server::handleClient, this, new_socket, username);
                     clientThread.detach();
                 }
@@ -89,8 +83,6 @@ public:
     }
 
     void handleClient(int client_socket, string username) {
-        string welcome_message = "Welcome, " + username + "!";
-        sendMessage(client_socket, welcome_message);
         char buffer[512] = {0};
         while (true) {
             int bytes_read = read(client_socket, buffer, 512);
@@ -98,23 +90,15 @@ public:
                 break;
             }
             string message(buffer, bytes_read);
-            sendMessageToRoom(client_socket, username + ": " + message);
+            generalRoom->sendMsgToRoom(username + ": " + message);
             buffer[0] = '\0';
         }
-        // Remover cliente al desconectar
         auto it = find(clients_sock.begin(), clients_sock.end(), client_socket);
         if (it != clients_sock.end()) {
             clients_sock.erase(it);
         }
-
         close(client_socket);
-        sendMessageToRoom(client_socket, username + " has left the chat.");
-    }
-
-   void sendMessageToRoom(int sender_socket, const string& message) {
-        for (int client_socket : clients_sock) {
-            sendMessage(client_socket, message);
-        }
+        generalRoom->removeClient(client_socket, username);
     }
 
     ~Server() {

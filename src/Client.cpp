@@ -21,7 +21,7 @@ private:
             int bytes_read = read(sock, buf, 1);
             if (bytes_read > 0) {
                 if (buf[0] == '\n') {
-                    cout << "Response: " << buffer << endl;
+                    cout << buffer << endl;
                     buffer.clear();
                 } else {
                     buffer += buf[0];
@@ -42,10 +42,8 @@ public:
             cout << "Server not connected" << endl;
             return;
         }
-        // Start a thread to receive messages from the server
         thread receiveThread(&Client::receiveMessages, this);
         receiveThread.detach();
-
         cout << "Hello, please insert your username" << endl;
         while (true) {
             string message;

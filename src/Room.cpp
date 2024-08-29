@@ -15,24 +15,25 @@ public:
     void addClient(int client_socket, const string& username) {
         clients_sock.push_back(client_socket);
         clients_names.push_back(username);
-        // Opcional: enviar un mensaje a todos los clientes cuando un nuevo cliente se una
-        string welcomeMessage = username + " has joined the room.";
-        broadcastMessage(welcomeMessage);
+        string welcome_message = "Welcome, " + username + "!\n";
+        send(client_socket,welcome_message.c_str(), welcome_message.size(), 0);
+        string join_msg = username + " has joined the room.";
+        sendMsgToRoom(join_msg);
     }
 
     void removeClient(int client_socket, const string& username) {
         auto it = find(clients_sock.begin(), clients_sock.end(), client_socket);
         if (it != clients_sock.end()) {
             clients_sock.erase(it);
-            // Opcional: enviar un mensaje a todos los clientes cuando un cliente se desconecte
-            string leaveMessage = username + " has left the room.";
-            broadcastMessage(leaveMessage);
+            string leave_msg = username + " has left the room.";
+            sendMsgToRoom(leave_msg);
         }
     }
 
-    void broadcastMessage(const string& message) {
+    void sendMsgToRoom(const string& message) {
+        string msg = message + "\n";
         for (int client_socket : clients_sock) {
-            send(client_socket, message.c_str(), message.size(), 0);
+            send(client_socket, msg.c_str(), msg.size(), 0);
         }
     }
 
