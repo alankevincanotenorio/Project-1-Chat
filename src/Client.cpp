@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <thread>
 using namespace std;
 
 class Client {
@@ -12,6 +13,22 @@ private:
     struct sockaddr_in serv_addr;
     string server_ip;
     int server_port;
+
+   void receiveMessages() {
+        string buffer;
+        char buf[1];
+        while (true) {
+            int bytes_read = read(sock, buf, 1);
+            if (bytes_read > 0) {
+                if (buf[0] == '\n') {
+                    cout << "Response: " << buffer << endl;
+                    buffer.clear();
+                } else {
+                    buffer += buf[0];
+                }
+            }
+        }
+    }
 
 public:
     Client(const string &ip, int port) : server_ip(ip), server_port(port) {}
@@ -25,17 +42,16 @@ public:
             cout << "Server not connected" << endl;
             return;
         }
+        // Start a thread to receive messages from the server
+        thread receiveThread(&Client::receiveMessages, this);
+        receiveThread.detach();
+
         cout << "Hello, please insert your username" << endl;
         while (true) {
             string message;
             getline(cin, message);
             if (message == "exit") break;
             send(sock, message.c_str(), message.size(), 0);
-            char buffer[512] = {0};
-            int bytes_read = read(sock, buffer, 512);
-            if (bytes_read > 0) {
-                cout << "Response: " << string(buffer, bytes_read) << endl;
-            }
         }
     }
 };

@@ -20,11 +20,14 @@ private:
     int port;
     bool socket_open;
     json users;
-    bool client_connected = false;
-    int connection_no = 0;
-    bool general_room_created = false;
     vector<int> clients_sock;
-    vector<string> clients_names;
+    bool client_connected = false;
+    unique_ptr<Room> generalRoom;
+
+    void sendMessage(int socket, const string& message) {
+        string msg = message + "\n"; // Add newline to delimit messages
+        send(socket, msg.c_str(), msg.size(), 0);
+    }
 
 public:
     Server(int port) : port(port), socket_open(false){}
@@ -58,6 +61,8 @@ public:
             return;
         }
         socket_open = true;
+            // Crear room general
+        generalRoom = make_unique<Room>("General");
     }
 
     void connectClient() {
@@ -65,13 +70,7 @@ public:
         while (true) {
             int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
             if (new_socket != -1) {
-                ++connection_no;
-                if (!general_room_created) {
-                    unique_ptr<Room> general = make_unique<Room>("General");
-                    general_room_created = true;
-                }
                 clients_sock.push_back(new_socket);
-                client_connected = true;
                 char buffer[512] = {0};
                 read(new_socket, buffer, 512);
                 string username(buffer);
@@ -79,7 +78,8 @@ public:
                     close(new_socket);
                 } else{
                     addUser(username);
-                    broadcastMessage(new_socket, username + " has joined the chat.");
+                    generalRoom->addClient(new_socket, username);
+                    sendMessage(new_socket, username + " has joined the chat.");
                     thread clientThread(&Server::handleClient, this, new_socket, username);
                     clientThread.detach();
                 }
@@ -90,7 +90,7 @@ public:
 
     void handleClient(int client_socket, string username) {
         string welcome_message = "Welcome, " + username + "!";
-        send(client_socket, welcome_message.c_str(), welcome_message.size(), 0);
+        sendMessage(client_socket, welcome_message);
         char buffer[512] = {0};
         while (true) {
             int bytes_read = read(client_socket, buffer, 512);
@@ -98,25 +98,22 @@ public:
                 break;
             }
             string message(buffer, bytes_read);
-            broadcastMessage(client_socket, username + ": " + message);
-            buffer[0] = '\0'; 
+            sendMessageToRoom(client_socket, username + ": " + message);
+            buffer[0] = '\0';
         }
-
         // Remover cliente al desconectar
         auto it = find(clients_sock.begin(), clients_sock.end(), client_socket);
         if (it != clients_sock.end()) {
             clients_sock.erase(it);
         }
-        
+
         close(client_socket);
-        broadcastMessage(client_socket, username + " has left the chat.");
+        sendMessageToRoom(client_socket, username + " has left the chat.");
     }
 
-    void broadcastMessage(int sender_socket, const string& message) {
+   void sendMessageToRoom(int sender_socket, const string& message) {
         for (int client_socket : clients_sock) {
-            if (client_socket != sender_socket) {
-                send(client_socket, message.c_str(), message.size(), 0);
-            }
+            sendMessage(client_socket, message);
         }
     }
 
@@ -130,7 +127,7 @@ public:
             }
         }
         for (int client_socket : clients_sock) {
-            close(client_socket); // Cerrar todos los sockets de clientes
+            close(client_socket);
         }
     }
 
