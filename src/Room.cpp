@@ -27,6 +27,7 @@ public:
             clients_sock.erase(it);
             string leave_msg = username + " has left the room.";
             sendMsgToRoom(leave_msg);
+            close(client_socket);
         }
     }
 

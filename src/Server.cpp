@@ -64,7 +64,6 @@ public:
         while (true) {
             int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
             if (new_socket != -1) {
-                clients_sock.push_back(new_socket);
                 char buffer[512] = {0};
                 read(new_socket, buffer, 512);
                 string username(buffer);
@@ -73,6 +72,7 @@ public:
                     close(new_socket);
                 } else{
                     addUser(username);
+                    clients_sock.push_back(new_socket);
                     generalRoom->addClient(new_socket, username);
                     thread clientThread(&Server::handleClient, this, new_socket, username);
                     clientThread.detach();
@@ -82,6 +82,7 @@ public:
         }
     }
 
+    //manda mensajes y borra clientes, se debe separar para implementar los json envolviendo y desenvolviendolos
     void handleClient(int client_socket, string username) {
         char buffer[512] = {0};
         while (true) {

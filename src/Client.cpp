@@ -13,6 +13,7 @@ private:
     struct sockaddr_in serv_addr;
     string server_ip;
     int server_port;
+    unique_ptr <thread> receiveThread;
 
    void receiveMessages() {
         string buffer;
@@ -33,6 +34,7 @@ private:
 public:
     Client(const string &ip, int port) : server_ip(ip), server_port(port) {}
 
+    //debe separar el mandar mensajes para que los envuelva y los desenvuela en un json
     void connectToServer() {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         serv_addr.sin_family = AF_INET;
