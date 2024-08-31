@@ -59,6 +59,7 @@ public:
         generalRoom = make_unique<Room>("General");
     }
 
+    //primero asignar el hilo de ejecucion
     void connectClient() {
         cout << "Server waiting connections..." << endl;
         while (true) {
@@ -83,6 +84,7 @@ public:
     }
 
     //manda mensajes y borra clientes, se debe separar para implementar los json envolviendo y desenvolviendolos
+    //pasar la parte del registro de usuario para aca
     void handleClient(int client_socket, string username) {
         char buffer[512] = {0};
         while (true) {
@@ -102,6 +104,7 @@ public:
         generalRoom->removeClient(client_socket, username);
     }
 
+    //modify
     ~Server() {
         if (socket_open && server_fd != -1) {
             cout << "Server destroyed" << endl;
@@ -137,6 +140,7 @@ public:
         return client_connected;
     }
 
+    //maybe borrarlos pq el json esta en protocol
     void addUser(string username) {
         users[username] = "ACTIVE";
     }
