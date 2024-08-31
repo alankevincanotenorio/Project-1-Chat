@@ -59,34 +59,30 @@ public:
         generalRoom = make_unique<Room>("General");
     }
 
-    //primero asignar el hilo de ejecucion
     void connectClient() {
         cout << "Server waiting connections..." << endl;
         while (true) {
             int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
             if (new_socket != -1) {
-                char buffer[512] = {0};
-                read(new_socket, buffer, 512);
-                string username(buffer);
-                if (getUserRegister(username) != "NO_SUCH_USER") {
-                    cout<<"User registered"<<endl;
-                    close(new_socket);
-                } else{
-                    addUser(username);
-                    clients_sock.push_back(new_socket);
-                    generalRoom->addClient(new_socket, username);
-                    thread clientThread(&Server::handleClient, this, new_socket, username);
-                    clientThread.detach();
-                }
+                thread clientThread(&Server::handleClient, this, new_socket);
+                clientThread.detach();
             }
             cout << "Server waiting more connections..." << endl;
         }
     }
 
-    //manda mensajes y borra clientes, se debe separar para implementar los json envolviendo y desenvolviendolos
-    //pasar la parte del registro de usuario para aca
-    void handleClient(int client_socket, string username) {
+    void handleClient(int client_socket) {
         char buffer[512] = {0};
+        read(client_socket, buffer, 512);
+            string username(buffer);
+            if (getUserRegister(username) != "NO_SUCH_USER") {
+                cout<<"User registered"<<endl;
+                close(client_socket);
+            } else{
+                addUser(username);
+                clients_sock.push_back(client_socket);
+                generalRoom->addClient(client_socket, username);
+            }
         while (true) {
             int bytes_read = read(client_socket, buffer, 512);
             if (bytes_read <= 0) {
