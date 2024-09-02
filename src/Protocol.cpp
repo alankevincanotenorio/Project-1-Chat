@@ -9,6 +9,7 @@ enum MessageType{
     IDENTIFY,
     RESPONSE,
     NEW_USER,
+    PUBLIC_TEXT_FROM
 };
 
 //make the others json
@@ -30,6 +31,11 @@ json makeJSON(MessageType type, string message){
             messageJSON["type"] = "NEW_USER";
             messageJSON["username"] = message;
             break;
+        case PUBLIC_TEXT_FROM:
+            messageJSON["type"] = "PUBLIC_TEXT_FROM";
+            messageJSON["username"] = "Kimberly";
+            messageJSON["text"] = message;
+            break;
         default:
             break;
     }
@@ -47,29 +53,3 @@ json StringToJSON(const string& jsonMessage){
     json json = json::parse(jsonMessage);
     return json;
 }
-
-//im not so sure bro
-string parseJSONToString(const json& j) {
-    string result = "\"" + j.at("type").get<string>() + "\"\n";
-    result += "\"" + j.at("username").get<string>() + "\"";
-    return result;
-}
-
-
-
-
-// int main() {
-//     std::string json_string = R"({"name": "John", "age": 30})";
-
-//     // Parsear el string JSON a un objeto JSON
-//     json j = json::parse(json_string);
-
-//     // Acceder a los datos
-//     std::string name = j["name"];
-//     int age = j["age"];
-
-//     std::cout << "Name: " << name << std::endl;
-//     std::cout << "Age: " << age << std::endl;
-
-//     return 0;
-// }

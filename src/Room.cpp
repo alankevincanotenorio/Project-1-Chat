@@ -42,4 +42,13 @@ public:
     string getName() const {
         return name;
     }
+
+    string getUserRegister(string u){
+        auto it = find(clients_names.begin(), clients_names.end(), u);
+        if(it != clients_names.end()){
+            // Calcula la posición del socket en el vector
+            int index = distance(clients_names.begin(), it);
+            return clients_names[index];
+        } else return "NO_SUCH_USER";
+    }
 };

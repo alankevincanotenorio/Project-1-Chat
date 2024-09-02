@@ -19,7 +19,6 @@ private:
     int addrlen = sizeof(address);
     int port;
     bool socket_open; //maybe erase
-    json users; //maybe erase
     vector<int> clients_sock;
     bool client_connected = false; //maybe erase
     unique_ptr<Room> generalRoom;
@@ -73,20 +72,25 @@ public:
         }
     }
 
-    //
+    //debe mandar ahora sus json al cliente
     void handleClient(int client_socket) {
         char buffer[512] = {0};
         if(userRegister(buffer, client_socket)){
             string username = getUsername(buffer);
             while (true) {
                 int bytes_read = read(client_socket, buffer, 512);
+                cout<<buffer;
                 if (bytes_read <= 0) break;
-                string message(buffer, bytes_read);
+                string message = getMessage(buffer);
+
+                if(message == "exit"){
+                    generalRoom->removeClient(client_socket, username);
+                    close(client_socket);
+                    break;
+                }
                 generalRoom->sendMsgToRoom(username + ": " + message);
                 buffer[0] = '\0';
             }
-            generalRoom->removeClient(client_socket, username);
-            close(client_socket);
         } else{
             return; // manejar el caso en que ya este registrado pero creo que es en el cliente
         }
@@ -95,12 +99,12 @@ public:
     bool userRegister(char username[], int client_socket){
         read(client_socket, username, 512);
         string u = getUsername(username);
-        if (getUserRegister(u) != "NO_SUCH_USER") {
+        string n = generalRoom->getUserRegister(u);
+        if (n != "NO_SUCH_USER") {
             cout<<"User registered"<<endl;
             close(client_socket);
             return false;
         } else{
-            addUser(u);
             clients_sock.push_back(client_socket);
             generalRoom->addClient(client_socket, u);
             return true;
@@ -114,6 +118,12 @@ public:
         return u;
     }
 
+    string getMessage(char us[]){
+        string un(us);
+        json user = StringToJSON(un);
+        string u = user["text"];
+        return u;
+    }
 
     //modify
     ~Server() {
@@ -147,17 +157,13 @@ public:
         return socket_open;
     }
 
-    string getUserRegister(string user) {
-        if (users.find(user) != users.end()) return user;
-        else return "NO_SUCH_USER";
-    }
 
     bool getClientConnected() {
         return client_connected;
     }
 
     //maybe borrarlos pq el json esta en protocol
-    void addUser(string username) {
-        users[username] = "ACTIVE";
-    }
+    // void addUser(string username) {
+    //     users[username] = "ACTIVE";
+    // }
 };
