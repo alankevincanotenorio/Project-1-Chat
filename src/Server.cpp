@@ -74,27 +74,31 @@ public:
 
     //debe mandar ahora sus json al cliente
     void handleClient(int client_socket) {
-        char buffer[512] = {0};
-        if(userRegister(buffer, client_socket)){
-            string username = getUsername(buffer);
-            while (true) {
-                int bytes_read = read(client_socket, buffer, 512);
-                cout<<buffer;
-                if (bytes_read <= 0) break;
-                string message = getMessage(buffer);
+    char buffer[512] = {0};
+    if(userRegister(buffer, client_socket)){
+        string username = getUsername(buffer);
+        while (true) {
+            memset(buffer, 0, sizeof(buffer));  // Limpiar el buffer antes de leer
+            int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+            if (bytes_read <= 0) break;
 
-                if(message == "exit"){
-                    generalRoom->removeClient(client_socket, username);
-                    close(client_socket);
-                    break;
-                }
-                generalRoom->sendMsgToRoom(username + ": " + message);
-                buffer[0] = '\0';
+            buffer[bytes_read] = '\0';  // Asegurar el terminador nulo
+            cout << buffer << endl;  // Debugging: ver el contenido del buffer
+
+            string message = getMessage(buffer);
+
+            if(message == "exit"){
+                generalRoom->removeClient(client_socket, username);
+                close(client_socket);
+                break;
             }
-        } else{
-            return; // manejar el caso en que ya este registrado pero creo que es en el cliente
+            generalRoom->sendMsgToRoom(username + ": " + message);
         }
+    } else {
+        return; // manejar el caso en que ya este registrado pero creo que es en el cliente
     }
+    }
+
 
     bool userRegister(char username[], int client_socket){
         read(client_socket, username, 512);

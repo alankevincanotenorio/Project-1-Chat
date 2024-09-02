@@ -17,16 +17,23 @@ private:
     unique_ptr <thread> receiveThread;
 
     void receiveMessages() {
-        char buf[512];
-        while (true) {
-            int bytes_read = read(sock, buf, sizeof(buf) - 1);
-            if (bytes_read > 0) {
-                buf[bytes_read] = '\0';
-                string message(buf);
-                cout << message;
-            }
+    char buf[512];
+    while (true) {
+        memset(buf, 0, sizeof(buf));  // Limpiar el buffer antes de recibir
+        int bytes_read = read(sock, buf, sizeof(buf) - 1);
+        if (bytes_read > 0) {
+            buf[bytes_read] = '\0';  // Asegurar el terminador nulo
+            string message(buf);
+            cout << message << endl;  // Mostrar el mensaje recibido
+        } else if (bytes_read == 0) {
+            // El servidor cerró la conexión
+            cout << "Server closed the connection" << endl;
+            close(sock);
+            break;
         }
     }
+}
+
 
 
 public:
