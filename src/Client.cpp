@@ -5,13 +5,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include "Protocol.cpp"
 using namespace std;
 
 class Client {
 private:
     int sock = 0;
     struct sockaddr_in serv_addr;
-    string server_ip;
+    string ip;
     int server_port;
     unique_ptr <thread> receiveThread;
 
@@ -24,28 +25,28 @@ private:
                 if (buf[0] == '\n') {
                     cout << buffer << endl;
                     buffer.clear();
-                } else {
-                    buffer += buf[0];
-                }
+                } else buffer += buf[0];
             }
         }
     }
 
 public:
-    Client(const string &ip, int port) : server_ip(ip), server_port(port) {}
+    Client(const string &ip, int port) : ip(ip), server_port(port) {}
 
-    //debe separar el mandar mensajes para que los envuelva y los desenvuela en un json
     void connectToServer() {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(server_port);
-        inet_pton(AF_INET, server_ip.c_str(), &serv_addr.sin_addr);
+        inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr);
         if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
             cout << "Server not connected" << endl;
             return;
         }
         thread receiveThread(&Client::receiveMessages, this);
         receiveThread.detach();
+    }
+
+    void connection(){
         cout << "Hello, please insert your username" << endl;
         while (true) {
             string message;
@@ -54,4 +55,7 @@ public:
             send(sock, message.c_str(), message.size(), 0);
         }
     }
+
+    
+
 };
