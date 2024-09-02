@@ -18,15 +18,16 @@ private:
     int opt = 1;
     int addrlen = sizeof(address);
     int port;
-    bool socket_open;
-    json users;
+    bool socket_open; //maybe erase
+    json users; //maybe erase
     vector<int> clients_sock;
-    bool client_connected = false;
+    bool client_connected = false; //maybe erase
     unique_ptr<Room> generalRoom;
 
 public:
     Server(int port) : port(port), socket_open(false){}
 
+    //maybe erase if
     void initSocket() {
         if (socket_open) {
             cerr << "The main socket is open" << endl;
@@ -59,50 +60,54 @@ public:
         generalRoom = make_unique<Room>("General");
     }
 
-    //primero asignar el hilo de ejecucion
+    //connect client method
     void connectClient() {
         cout << "Server waiting connections..." << endl;
         while (true) {
             int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
             if (new_socket != -1) {
-                char buffer[512] = {0};
-                read(new_socket, buffer, 512);
-                string username(buffer);
-                if (getUserRegister(username) != "NO_SUCH_USER") {
-                    cout<<"User registered"<<endl;
-                    close(new_socket);
-                } else{
-                    addUser(username);
-                    clients_sock.push_back(new_socket);
-                    generalRoom->addClient(new_socket, username);
-                    thread clientThread(&Server::handleClient, this, new_socket, username);
-                    clientThread.detach();
-                }
+                thread clientThread(&Server::handleClient, this, new_socket);
+                clientThread.detach();
             }
             cout << "Server waiting more connections..." << endl;
         }
     }
 
-    //manda mensajes y borra clientes, se debe separar para implementar los json envolviendo y desenvolviendolos
-    //pasar la parte del registro de usuario para aca
-    void handleClient(int client_socket, string username) {
+    //
+    void handleClient(int client_socket) {
         char buffer[512] = {0};
-        while (true) {
-            int bytes_read = read(client_socket, buffer, 512);
-            if (bytes_read <= 0) {
-                break;
+        if(userRegister(buffer, client_socket)){
+            string username(buffer);
+            while (true) {
+                int bytes_read = read(client_socket, buffer, 512);
+                if (bytes_read <= 0) break;
+                string message(buffer, bytes_read);
+                generalRoom->sendMsgToRoom(username + ": " + message);
+                buffer[0] = '\0';
             }
-            string message(buffer, bytes_read);
-            generalRoom->sendMsgToRoom(username + ": " + message);
-            buffer[0] = '\0';
+            generalRoom->removeClient(client_socket, username);
+            close(client_socket);
+        } else{
+            return; // manejar el caso en que ya este registrado pero creo que es en el cliente
         }
-        auto it = find(clients_sock.begin(), clients_sock.end(), client_socket);
-        if (it != clients_sock.end()) {
-            clients_sock.erase(it);
-        }
-        close(client_socket);
-        generalRoom->removeClient(client_socket, username);
     }
+
+    bool userRegister(char username[], int client_socket){
+        read(client_socket, username, 512);
+        if (getUserRegister(username) != "NO_SUCH_USER") {
+            cout<<"User registered"<<endl;
+            close(client_socket);
+            return false;
+        } else{
+            addUser(username);
+            clients_sock.push_back(client_socket);
+            generalRoom->addClient(client_socket, username);
+            return true;
+        }
+    }
+
+
+
 
     //modify
     ~Server() {
@@ -118,6 +123,11 @@ public:
             close(client_socket);
         }
     }
+
+
+
+
+    //maybe erase idk
 
     int getPort() const {
         return port;
