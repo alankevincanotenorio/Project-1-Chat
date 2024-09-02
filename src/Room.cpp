@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "Protocol.cpp"
 using namespace std;
 
 class Room {

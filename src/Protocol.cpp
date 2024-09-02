@@ -4,25 +4,48 @@
 using json = nlohmann::json;
 using namespace std;
 
-//agregar los tipos que faltan
+//add rest of the types
 enum MessageType{
     IDENTIFY,
     RESPONSE,
     NEW_USER,
-    TEXT_FROM
 };
 
-//falta hacer mas json
-//funcion para pasar de string a json
+//make the others json
+//String to json
 json makeJSON(MessageType type, string message){
     json messageJSON;
     switch(type){
         case IDENTIFY:
-        messageJSON["type"] = "IDENTIFY";
-        messageJSON["username"] = message;
-        break;
+            messageJSON["type"] = "IDENTIFY";
+            messageJSON["username"] = message;
+            break;
+        case RESPONSE:
+            messageJSON["type"] = "RESPONSE";
+            messageJSON["operation"] = "IDENTIFY";
+            messageJSON["result"] = "SUCCESS";
+            messageJSON["extra"] = message;
+            break;
+        case NEW_USER:
+            messageJSON["type"] = "NEW_USER";
+            messageJSON["username"] = message;
+            break;
+        default:
+            break;
     }
     return messageJSON;
+}
+
+//serializar
+string JSONToString(const json& j){
+    string jsonMessage = j.dump();
+    return jsonMessage;
+}
+
+//parsear
+json StringToJSON(const string& jsonMessage){
+    json json = json::parse(jsonMessage);
+    return json;
 }
 
 //im not so sure bro
@@ -32,12 +55,21 @@ string parseJSONToString(const json& j) {
     return result;
 }
 
-int main(){
-    cout<<"ingresa algo"<<endl;
-    string message;
-    getline(cin, message);
-    json json = makeJSON(IDENTIFY, message);    
-    string jj = parseJSONToString(json);
-    cout<<jj<<endl;
-    return 0;
-}
+
+
+
+// int main() {
+//     std::string json_string = R"({"name": "John", "age": 30})";
+
+//     // Parsear el string JSON a un objeto JSON
+//     json j = json::parse(json_string);
+
+//     // Acceder a los datos
+//     std::string name = j["name"];
+//     int age = j["age"];
+
+//     std::cout << "Name: " << name << std::endl;
+//     std::cout << "Age: " << age << std::endl;
+
+//     return 0;
+// }
