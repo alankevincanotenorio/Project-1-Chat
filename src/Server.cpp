@@ -77,7 +77,7 @@ public:
     void handleClient(int client_socket) {
         char buffer[512] = {0};
         if(userRegister(buffer, client_socket)){
-            string username(buffer);
+            string username = getUsername(buffer);
             while (true) {
                 int bytes_read = read(client_socket, buffer, 512);
                 if (bytes_read <= 0) break;
@@ -94,19 +94,25 @@ public:
 
     bool userRegister(char username[], int client_socket){
         read(client_socket, username, 512);
-        if (getUserRegister(username) != "NO_SUCH_USER") {
+        string u = getUsername(username);
+        if (getUserRegister(u) != "NO_SUCH_USER") {
             cout<<"User registered"<<endl;
             close(client_socket);
             return false;
         } else{
-            addUser(username);
+            addUser(u);
             clients_sock.push_back(client_socket);
-            generalRoom->addClient(client_socket, username);
+            generalRoom->addClient(client_socket, u);
             return true;
         }
     }
 
-    
+    string getUsername(char us[]){
+        string un(us);
+        json user = StringToJSON(un);
+        string u = user["username"];
+        return u;
+    }
 
 
     //modify

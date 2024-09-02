@@ -10,7 +10,7 @@ int main(int args, char* port_char[]) {
     }
     int port = stoi(port_char[1]);
     unique_ptr<Client> client = make_unique<Client>("127.0.0.1", port);
-    client->connectToServer();
+    if(client->connectToServer() == -1) return 0;
     client->connection();
     return 0;
 }

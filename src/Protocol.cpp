@@ -23,7 +23,7 @@ json makeJSON(MessageType type, string message){
         case RESPONSE:
             messageJSON["type"] = "RESPONSE";
             messageJSON["operation"] = "IDENTIFY";
-            messageJSON["result"] = "SUCCESS";
+            messageJSON["result"] = "USER_ALREADY_EXISTS";
             messageJSON["extra"] = message;
             break;
         case NEW_USER:
