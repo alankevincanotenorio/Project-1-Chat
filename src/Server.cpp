@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
-#include <vector>
 #include "../libs/json.hpp"
 #include "Room.cpp"
 using json = nlohmann::json;
@@ -18,20 +17,13 @@ private:
     int opt = 1;
     int addrlen = sizeof(address);
     int port;
-    bool socket_open; //maybe erase
-    vector<int> clients_sock;
-    bool client_connected = false; //maybe erase
     unique_ptr<Room> generalRoom;
 
 public:
-    Server(int port) : port(port), socket_open(false){}
+    Server(int port) : port(port) {}
 
     //maybe erase if
     void initSocket() {
-        if (socket_open) {
-            cerr << "The main socket is open" << endl;
-            return;
-        }
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd == -1) {
             cerr << "Error creating socket: " << strerror(errno) << endl;
@@ -55,7 +47,6 @@ public:
             close(server_fd);
             return;
         }
-        socket_open = true;
         generalRoom = make_unique<Room>("General");
     }
 
@@ -72,82 +63,62 @@ public:
         }
     }
 
-    //debe mandar ahora sus json al cliente
+    //only left send a json to client
     void handleClient(int client_socket) {
-    char buffer[512] = {0};
-    if(userRegister(buffer, client_socket)){
-        string username = getUsername(buffer);
-        while (true) {
-            memset(buffer, 0, sizeof(buffer));  // Limpiar el buffer antes de leer
-            int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
-            if (bytes_read <= 0) break;
-
-            buffer[bytes_read] = '\0';  // Asegurar el terminador nulo
-            cout << buffer << endl;  // Debugging: ver el contenido del buffer
-
-            string message = getMessage(buffer);
-
-            if(message == "exit"){
-                generalRoom->removeClient(client_socket, username);
-                close(client_socket);
-                break;
+        char buffer[512] = {0};
+        if(userRegister(buffer, client_socket)){
+            string username = getData(buffer, "username");
+            while (true) {
+                int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+                if (bytes_read <= 0) break;
+                buffer[bytes_read] = '\0';
+                string message = getData(buffer, "text");
+                if(message == "exit"){
+                    generalRoom->removeClient(client_socket, username);
+                    close(client_socket);
+                    break;
+                }
+                generalRoom->sendMsgToRoom(username + ": " + message);
             }
-            generalRoom->sendMsgToRoom(username + ": " + message);
+        } else {
+            string usr_exist = "User already registered";
+            send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
+            close(client_socket);
+            return;
         }
-    } else {
-        return; // manejar el caso en que ya este registrado pero creo que es en el cliente
-    }
     }
 
-
+    //verify is a user is registered
     bool userRegister(char username[], int client_socket){
         read(client_socket, username, 512);
-        string u = getUsername(username);
+        string u = getData(username, "username");
         string n = generalRoom->getUserRegister(u);
-        if (n != "NO_SUCH_USER") {
-            cout<<"User registered"<<endl;
-            close(client_socket);
-            return false;
-        } else{
-            clients_sock.push_back(client_socket);
+        if (n != "NO_SUCH_USER") return false;
+        else{
             generalRoom->addClient(client_socket, u);
             return true;
         }
     }
 
-    string getUsername(char us[]){
-        string un(us);
-        json user = StringToJSON(un);
-        string u = user["username"];
-        return u;
-    }
-
-    string getMessage(char us[]){
-        string un(us);
-        json user = StringToJSON(un);
-        string u = user["text"];
-        return u;
+    //get data from a json
+    string getData(char buffer[], string type){
+        string msg(buffer);
+        json json_msg = StringToJSON(msg);
+        string data;
+        if(type == "username") data = json_msg["username"];
+        if(type == "text") data = json_msg["text"];
+        return data;   
     }
 
     //modify
     ~Server() {
-        if (socket_open && server_fd != -1) {
+        if (server_fd != -1) {
             cout << "Server destroyed" << endl;
             if (close(server_fd) == -1) {
                 cerr << "Error closing socket: " << strerror(errno) << endl;
-            } else {
-                socket_open = false; 
             }
         }
-        for (int client_socket : clients_sock) {
-            close(client_socket);
-        }
     }
-
-
-
-
-    //maybe erase idk
 
     int getPort() const {
         return port;
@@ -157,17 +128,4 @@ public:
         return server_fd;
     }
 
-    bool getSocket_open() {
-        return socket_open;
-    }
-
-
-    bool getClientConnected() {
-        return client_connected;
-    }
-
-    //maybe borrarlos pq el json esta en protocol
-    // void addUser(string username) {
-    //     users[username] = "ACTIVE";
-    // }
 };

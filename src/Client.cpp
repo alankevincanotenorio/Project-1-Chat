@@ -17,26 +17,29 @@ private:
     unique_ptr <thread> receiveThread;
 
     void receiveMessages() {
-    char buf[512];
-    while (true) {
-        memset(buf, 0, sizeof(buf));  // Limpiar el buffer antes de recibir
-        int bytes_read = read(sock, buf, sizeof(buf) - 1);
-        if (bytes_read > 0) {
-            buf[bytes_read] = '\0';  // Asegurar el terminador nulo
-            string message(buf);
-            cout << message << endl;  // Mostrar el mensaje recibido
-        } else if (bytes_read == 0) {
-            // El servidor cerró la conexión
-            cout << "Server closed the connection" << endl;
-            close(sock);
-            break;
+        char buffer[512];
+        while (true) {
+            int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
+            if (bytes_read > 0) {
+                buffer[bytes_read] = '\0';
+                string message(buffer);
+                cout << message;
+            } else if (bytes_read == 0) {
+                close(sock);
+                break;
+            }
         }
     }
-}
 
-
+    void sendMessage(MessageType type, string message){
+        json json_msg = makeJSON(type, message);
+        string msg = JSONToString(json_msg);
+        send(sock, msg.c_str(), msg.size(), 0);
+    }
 
 public:
+    string user_name;
+    string status;
     Client(const string &ip, int port) : ip(ip), server_port(port) {}
 
     int connectToServer() {
@@ -53,35 +56,15 @@ public:
         return 0;
     }
 
-    //falta que se impriman bien los mensajes pq se imprimen los mismo json jssj 
     void connection(){
         cout << "Hello, please insert your username" << endl;
-        string messa;
-        getline(cin, messa);
-        identify(messa);
+        getline(cin, user_name);
+        sendMessage(IDENTIFY, user_name);
         while (true) {
             string message;
             getline(cin, message);
-            sendMessage(message);
+            sendMessage(PUBLIC_TEXT_FROM, message);
         }
     }
-
-    //metodo para mandar la identificacion
-    void identify(string message){
-        json j = makeJSON(IDENTIFY, message);
-        string m = JSONToString(j);
-        send(sock, m.c_str(), m.size(), 0);
-        //si recibe el protocolo negativo lo bota con return;
-    }
-
-    void sendMessage(string message){
-        json j = makeJSON(PUBLIC_TEXT_FROM, message);
-        string m = JSONToString(j);
-        send(sock, m.c_str(), m.size(), 0);
-        //si recibe el protocolo negativo lo bota con return;
-    }
-    //metodo para mandar mensaje general
-    //metodo para mandar mensaje privado
-    //metodo para mandar 
 
 };
