@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
-#include "Protocol.cpp"
+#include "Message.cpp"
 using namespace std;
 
 class Client {
@@ -37,6 +37,12 @@ private:
         send(sock, msg.c_str(), msg.size(), 0);
     }
 
+    void sendIdentify(MessageType type, string message){
+        json json_msg = makeIDENTIFY(type, message);
+        string msg = JSONToString(json_msg);
+        send(sock, msg.c_str(), msg.size(), 0);
+    }
+
 public:
     string user_name;
     string status;
@@ -59,7 +65,7 @@ public:
     void connection(){
         cout << "Hello, please insert your username" << endl;
         getline(cin, user_name);
-        sendMessage(IDENTIFY, user_name);
+        sendIdentify(IDENTIFY, user_name);
         while (true) {
             string message;
             getline(cin, message);

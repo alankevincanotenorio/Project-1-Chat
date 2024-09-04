@@ -2,7 +2,6 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-#include "Protocol.cpp"
 using namespace std;
 
 class Room {

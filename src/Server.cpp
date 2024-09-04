@@ -7,6 +7,7 @@
 #include <thread>
 #include "../libs/json.hpp"
 #include "Room.cpp"
+#include "Message.cpp"
 using json = nlohmann::json;
 using namespace std;
 
@@ -72,6 +73,7 @@ public:
                 int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
                 if (bytes_read <= 0) break;
                 buffer[bytes_read] = '\0';
+                cout << "Mensaje recibido del cliente: " << buffer << endl;
                 string message = getData(buffer, "text");
                 if(message == "exit"){
                     generalRoom->removeClient(client_socket, username);
@@ -90,7 +92,9 @@ public:
 
     //verify is a user is registered
     bool userRegister(char username[], int client_socket){
-        read(client_socket, username, 512);
+        int bytes_read = read(client_socket, username, 512);
+        username[bytes_read] = '\0';
+        cout << "Mensaje recibido para el registro: " << username << endl; //debugg
         string u = getData(username, "username");
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;
