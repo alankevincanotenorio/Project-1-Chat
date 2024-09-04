@@ -97,3 +97,15 @@ json StringToJSON(const string& jsonMessage){
     json json = json::parse(jsonMessage);
     return json;
 }
+
+
+//get data from a json
+    string getData(char buffer[], string type){
+        string msg(buffer);
+        json json_msg = StringToJSON(msg);
+        string data;
+        if(type == "username") data = json_msg["username"];
+        if(type == "text") data = json_msg["text"];
+        if(type == "result") data = json_msg["result"];
+        return data;   
+    }

@@ -22,8 +22,10 @@ private:
             int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
             if (bytes_read > 0) {
                 buffer[bytes_read] = '\0';
-                string message(buffer);
-                cout << message;
+                string received(buffer);
+                cout << "Mensaje recibido: " << received << endl;
+                string g = getData(buffer, "result");
+                cout << g;
             } else if (bytes_read == 0) {
                 close(sock);
                 break;

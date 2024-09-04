@@ -99,20 +99,16 @@ public:
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;
         else{
+            json response = makeIDENTIFY(RESPONSE, u, "SUCCESS");
+            string r = JSONToString(response);
+            cout<<"El servidor responde: " << r;
+            send(client_socket, r.c_str(), r.size(), 0);
             generalRoom->addClient(client_socket, u);
             return true;
         }
     }
 
-    //get data from a json
-    string getData(char buffer[], string type){
-        string msg(buffer);
-        json json_msg = StringToJSON(msg);
-        string data;
-        if(type == "username") data = json_msg["username"];
-        if(type == "text") data = json_msg["text"];
-        return data;   
-    }
+
 
     //modify
     ~Server() {
