@@ -16,6 +16,7 @@ private:
     int server_port;
     unique_ptr <thread> receiveThread;
 
+    //este metodo si jala pero falta el new_user de imprimir
     void receiveMessages() {
         char buffer[512];
         while (true) {
@@ -24,8 +25,22 @@ private:
                 buffer[bytes_read] = '\0';
                 string received(buffer);
                 cout << "Mensaje recibido: " << received << endl;
-                string g = getData(buffer, "result");
-                cout << g;
+                if (received.front() == '{' && received.back() == '}') {
+                    json json_msg = StringToJSON(received);
+                    string message_type = json_msg["type"];
+                    if (message_type == "RESPONSE") {
+                        string result = json_msg["result"];
+                        if (result == "SUCCESS") {
+                            //ya
+                            cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl<<result<<endl;
+                        } else if (result == "USER_ALREADY_EXISTS") {
+                            cout << "El nombre de usuario ya está en uso." << endl;
+                            break; //ya
+                        } 
+                    }
+                } else {
+                    cout <<"Mensaje no json: " << received;
+                }
             } else if (bytes_read == 0) {
                 close(sock);
                 break;
@@ -33,16 +48,21 @@ private:
         }
     }
 
+
+
+
     void sendMessage(MessageType type, string message){
         json json_msg = makeJSON(type, message);
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
+        cout<<"Mensaje enviado json: " << msg << endl;
     }
 
     void sendIdentify(MessageType type, string message){
         json json_msg = makeIDENTIFY(type, message);
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
+        cout<<"Mensaje enviado json: " << msg << endl;
     }
 
 public:

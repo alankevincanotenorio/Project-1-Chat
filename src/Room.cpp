@@ -2,6 +2,9 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include "../libs/json.hpp"
+#include "Message.cpp"
+using json = nlohmann::json;
 using namespace std;
 
 class Room {
@@ -12,12 +15,14 @@ private:
 public:
     Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, int>>()) {}
 
-    void addClient(int client_socket, const string& username) {
+    void addClient(int client_socket, const string& success) {
+        json response = StringToJSON(success);
+        string username = response["extra"];
         (*clients)[username] = client_socket;
-        string welcome_message = "Welcome, " + username + "!\n";
-        send(client_socket,welcome_message.c_str(), welcome_message.size(), 0);
-        string join_msg = username + " has joined the room.";
-        sendMsgToRoom(join_msg);
+        json nu = makeIDENTIFY(NEW_USER, username);
+        string m = JSONToString(nu);
+        sendMsgToRoom(m);
+        //sendMsgToRoom(username + "has joined to room");
     }
 
     void removeClient(int client_socket, const string& username) {

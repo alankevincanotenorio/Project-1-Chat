@@ -7,8 +7,6 @@
 #include <thread>
 #include "../libs/json.hpp"
 #include "Room.cpp"
-#include "Message.cpp"
-using json = nlohmann::json;
 using namespace std;
 
 class Server {
@@ -67,34 +65,33 @@ public:
     //only left send a json to client
     void handleClient(int client_socket) {
         char buffer[512] = {0};
-        if(userRegister(buffer, client_socket)){
+        if (userRegister(buffer, client_socket)) {
             string username = getData(buffer, "username");
             while (true) {
                 int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
                 if (bytes_read <= 0) break;
                 buffer[bytes_read] = '\0';
-                cout << "Mensaje recibido del cliente: " << buffer << endl;
                 string message = getData(buffer, "text");
-                if(message == "exit"){
+                if (message == "exit") {
                     generalRoom->removeClient(client_socket, username);
                     close(client_socket);
                     break;
                 }
                 generalRoom->sendMsgToRoom(username + ": " + message);
-            }
+            }  
         } else {
-            string usr_exist = "User already registered";
+            json response = makeIDENTIFY(RESPONSE, getData(buffer, "username"), "USER_ALREADY_EXISTS");
+            string usr_exist = JSONToString(response);
             send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
             close(client_socket);
-            return;
         }
+
     }
 
     //verify is a user is registered
     bool userRegister(char username[], int client_socket){
         int bytes_read = read(client_socket, username, 512);
         username[bytes_read] = '\0';
-        cout << "Mensaje recibido para el registro: " << username << endl; //debugg
         string u = getData(username, "username");
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;
@@ -103,7 +100,7 @@ public:
             string r = JSONToString(response);
             cout<<"El servidor responde: " << r;
             send(client_socket, r.c_str(), r.size(), 0);
-            generalRoom->addClient(client_socket, u);
+            generalRoom->addClient(client_socket, r);
             return true;
         }
     }
