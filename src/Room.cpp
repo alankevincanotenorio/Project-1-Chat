@@ -22,7 +22,6 @@ public:
         json nu = makeIDENTIFY(NEW_USER, username);
         string m = JSONToString(nu);
         sendMsgToRoom(m);
-        //sendMsgToRoom(username + "has joined to room");
     }
 
     void removeClient(int client_socket, const string& username) {
@@ -36,7 +35,9 @@ public:
     }
 
     void sendMsgToRoom(const string& message) {
-        string msg = message + "\n";
+        string msg;
+        if(message.front() == '{' && message.back() == '}') msg = message;
+        else msg = message + "\n";
         for (const auto& [username, client_socket] : *clients) {
             send(client_socket, msg.c_str(), msg.size(), 0);
         }

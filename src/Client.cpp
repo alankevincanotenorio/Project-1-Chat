@@ -16,30 +16,34 @@ private:
     int server_port;
     unique_ptr <thread> receiveThread;
 
-    //este metodo si jala pero falta el new_user de imprimir
+    //falta agregar que el username esta delimitado
     void receiveMessages() {
-        char buffer[512];
+        char buffer[512] = {0};
         while (true) {
             int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
             if (bytes_read > 0) {
                 buffer[bytes_read] = '\0';
                 string received(buffer);
-                cout << "Mensaje recibido: " << received << endl;
+                string n(buffer);
                 if (received.front() == '{' && received.back() == '}') {
+                    cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = StringToJSON(received);
                     string message_type = json_msg["type"];
                     if (message_type == "RESPONSE") {
-                        string result = json_msg["result"];
-                        if (result == "SUCCESS") {
-                            //ya
-                            cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl<<result<<endl;
-                        } else if (result == "USER_ALREADY_EXISTS") {
-                            cout << "El nombre de usuario ya está en uso." << endl;
-                            break; //ya
-                        } 
+                    string result = json_msg["result"];
+                    if (result == "SUCCESS") {
+                        cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
+                    } else if (result == "USER_ALREADY_EXISTS") {
+                        cout << "El nombre de usuario ya está en uso." << endl;
+                        break;
                     }
+                } else if (message_type == "NEW_USER") {
+                    string new_user = json_msg["username"];
+                    cout << "Nuevo usuario conectado: " << new_user << endl; // Procesa el mensaje de nuevo usuario
+                }
+
                 } else {
-                    cout <<"Mensaje no json: " << received;
+                    cout <<"Mensaje no json: " << n;
                 }
             } else if (bytes_read == 0) {
                 close(sock);
@@ -47,9 +51,6 @@ private:
             }
         }
     }
-
-
-
 
     void sendMessage(MessageType type, string message){
         json json_msg = makeJSON(type, message);
