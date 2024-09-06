@@ -23,8 +23,6 @@ public:
         json nu = makeIDENTIFY(NEW_USER, username);
         string m = JSONToString(nu);
         sendMsgToRoom(m, client_socket);
-        // string status = get<0>((*clients)[username]);
-        // send(client_socket, status.c_str(), status.size(), 0);
     }
 
     void removeClient(int client_socket, const string& username) {
