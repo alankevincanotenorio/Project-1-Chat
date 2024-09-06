@@ -16,7 +16,7 @@ private:
     int server_port;
     unique_ptr <thread> receiveThread;
 
-    //falta agregar que el username esta delimitado
+    //cambiar por un switch y el switch hacerlo en otro metodo
     void receiveMessages() {
         char buffer[512] = {0};
         while (true) {
@@ -41,8 +41,8 @@ private:
                         exit(0);
                     }
                 } else if (message_type == "NEW_USER") {
-                    string new_user = json_msg["username"];
-                    cout << "Nuevo usuario conectado: " << new_user << endl; // Procesa el mensaje de nuevo usuario
+                    user_name = json_msg["username"];
+                    cout << "Nuevo usuario conectado: " << status << user_name << endl; 
                 }
 
                 } else {
@@ -59,7 +59,7 @@ private:
         json json_msg = makeJSON(type, message);
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
-        if (type == PUBLIC_TEXT_FROM) cout << "Tú: " << message << endl;
+        if (type == PUBLIC_TEXT_FROM) cout << status<< "Tú: " << message << endl;
         cout<<"Mensaje enviado json: " << msg << endl;
     }
 
