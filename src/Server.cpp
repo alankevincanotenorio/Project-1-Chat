@@ -93,6 +93,12 @@ public:
         int bytes_read = read(client_socket, username, 512);
         username[bytes_read] = '\0';
         string u = getData(username, "username");
+        if(u.size() > 8) {
+            json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
+            string s = JSONToString(r);
+            send(client_socket, s.c_str(), s.size(), 0);
+            close(client_socket);
+        }
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;
         else{

@@ -85,6 +85,13 @@ json makeIDENTIFY(MessageType type, const string& username, const string& result
     return id_json;
 }
 
+json makeINVALID(MessageType type, const string& result) {
+    json id_json;
+    id_json["type"] = "RESPONSE";
+    id_json["operation"] = "INVALID";
+    id_json["result"] = result;
+    return id_json;
+}
 
 //serializar
 string JSONToString(const json& j){

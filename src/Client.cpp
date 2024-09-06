@@ -36,6 +36,9 @@ private:
                     } else if (result == "USER_ALREADY_EXISTS") {
                         cout << "El nombre de usuario ya está en uso." << endl;
                         break;
+                    } else if (result == "NOT_IDENTIFIED") {
+                        cout << "Sigue las reglas porfa" << endl;
+                        exit(0);
                     }
                 } else if (message_type == "NEW_USER") {
                     string new_user = json_msg["username"];
@@ -87,7 +90,7 @@ public:
     }
 
     void connection(){
-        cout << "Hello, please insert your username" << endl;
+        cout << "Hello, please insert your username (max. 8 characters)" << endl;
         getline(cin, user_name);
         sendIdentify(IDENTIFY, user_name);
         while (true) {
