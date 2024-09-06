@@ -77,7 +77,7 @@ public:
                     close(client_socket);
                     break;
                 }
-                generalRoom->sendMsgToRoom(username + ": " + message);
+                generalRoom->sendMsgToRoom(username + ": " + message, client_socket);
             }  
         } else {
             json response = makeIDENTIFY(RESPONSE, getData(buffer, "username"), "USER_ALREADY_EXISTS");

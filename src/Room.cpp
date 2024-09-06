@@ -21,7 +21,7 @@ public:
         (*clients)[username] = client_socket;
         json nu = makeIDENTIFY(NEW_USER, username);
         string m = JSONToString(nu);
-        sendMsgToRoom(m);
+        sendMsgToRoom(m, client_socket);
     }
 
     void removeClient(int client_socket, const string& username) {
@@ -29,17 +29,17 @@ public:
         if (it != clients->end() && it->second == client_socket) {
             clients->erase(it);
             string leave_msg = username + " has left the room.";
-            sendMsgToRoom(leave_msg);
+            sendMsgToRoom(leave_msg, client_socket);
             close(client_socket);
         }
     }
 
-    void sendMsgToRoom(const string& message) {
+    void sendMsgToRoom(const string& message, int socket_sender) {
         string msg;
-        if(message.front() == '{' && message.back() == '}') msg = message;
+        if(message.front() == '{' && message.back() == '}') msg = message; //por esta linea falla, primero tendre que procesar un json y luego otro
         else msg = message + "\n";
         for (const auto& [username, client_socket] : *clients) {
-            send(client_socket, msg.c_str(), msg.size(), 0);
+            if (client_socket != socket_sender) send(client_socket, msg.c_str(), msg.size(), 0);
         }
     }
 

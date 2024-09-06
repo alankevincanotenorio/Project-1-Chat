@@ -56,6 +56,7 @@ private:
         json json_msg = makeJSON(type, message);
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
+        if (type == PUBLIC_TEXT_FROM) cout << "Tú: " << message << endl;
         cout<<"Mensaje enviado json: " << msg << endl;
     }
 

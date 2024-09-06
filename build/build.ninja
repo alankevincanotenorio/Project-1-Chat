@@ -28,7 +28,7 @@ rule CUSTOM_COMMAND
  restat = 1
 
 rule REGENERATE_BUILD
- command = /usr/bin/meson --internal regenerate /home/alan/Programacion/Proyecto_1:Chat /home/alan/Programacion/Proyecto_1:Chat/build
+ command = /usr/bin/meson --internal regenerate /home/alan/Downloads/prg/chat/Project-1-Chat /home/alan/Downloads/prg/chat/Project-1-Chat/build
  description = Regenerating build files.
  generator = 1
 
@@ -38,20 +38,20 @@ build PHONY: phony
 
 # Build rules for targets
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client.p/src_main_client.cpp.o: cpp_COMPILER ../src/main_client.cpp
- DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d
- DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p/src_main_client.cpp.o.d
- ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_client.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
+build /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client.p/src_main_client.cpp.o: cpp_COMPILER ../src/main_client.cpp
+ DEPFILE = /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client.p/src_main_client.cpp.o.d
+ DEPFILE_UNQUOTED = /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client.p/src_main_client.cpp.o.d
+ ARGS = -I/home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client.p/src_main_client.cpp.o
+build /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client: cpp_LINKER /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client.p/src_main_client.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server.p/src_main_server.cpp.o: cpp_COMPILER ../src/main_server.cpp
- DEPFILE = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p/src_main_server.cpp.o.d
- DEPFILE_UNQUOTED = /home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p/src_main_server.cpp.o.d
- ARGS = -I/home/alan/Programacion/Proyecto_1:Chat/build/bin/main_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
+build /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server.p/src_main_server.cpp.o: cpp_COMPILER ../src/main_server.cpp
+ DEPFILE = /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server.p/src_main_server.cpp.o.d
+ DEPFILE_UNQUOTED = /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server.p/src_main_server.cpp.o.d
+ ARGS = -I/home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server.p -I. -I.. -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O0 -g
 
-build /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server: cpp_LINKER /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server.p/src_main_server.cpp.o
+build /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server: cpp_LINKER /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server.p/src_main_server.cpp.o
  LINK_ARGS = -Wl,--as-needed -Wl,--no-undefined
 
 build test_server.p/tests_test_server.cpp.o: cpp_COMPILER ../tests/test_server.cpp
@@ -109,13 +109,13 @@ build meson-internal__dist: CUSTOM_COMMAND PHONY
 build TAGS: phony meson-internal__TAGS
 
 build meson-internal__TAGS: CUSTOM_COMMAND PHONY
- COMMAND = /usr/bin/meson --internal tags etags /home/alan/Programacion/Proyecto_1:Chat
+ COMMAND = /usr/bin/meson --internal tags etags /home/alan/Downloads/prg/chat/Project-1-Chat
  pool = console
 
 build ctags: phony meson-internal__ctags
 
 build meson-internal__ctags: CUSTOM_COMMAND PHONY
- COMMAND = /usr/bin/meson --internal tags ctags /home/alan/Programacion/Proyecto_1:Chat
+ COMMAND = /usr/bin/meson --internal tags ctags /home/alan/Downloads/prg/chat/Project-1-Chat
  pool = console
 
 build uninstall: phony meson-internal__uninstall
@@ -124,7 +124,7 @@ build meson-internal__uninstall: CUSTOM_COMMAND PHONY
  COMMAND = /usr/bin/meson --internal uninstall
  pool = console
 
-build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_client /home/alan/Programacion/Proyecto_1$:Chat/build/bin/main_server test_server
+build all: phony meson-test-prereq meson-benchmark-prereq /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_client /home/alan/Downloads/prg/chat/Project-1-Chat/build/bin/main_server test_server
 
 build meson-test-prereq: phony test_server
 
