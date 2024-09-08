@@ -17,6 +17,8 @@ private:
     int addrlen = sizeof(address);
     int port;
     unique_ptr<Room> generalRoom;
+    unique_ptr<unordered_map<int, int>> clients_sockets;
+    unique_ptr<unordered_map<string, Room>> rooms;
 
 public:
     Server(int port) : port(port) {}
@@ -99,7 +101,7 @@ public:
             json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
             string s = JSONToString(r);
             send(client_socket, s.c_str(), s.size(), 0);
-            close(client_socket);
+            close(client_socket); return false;
         }
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;

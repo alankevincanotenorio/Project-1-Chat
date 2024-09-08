@@ -73,7 +73,7 @@ json makeIDENTIFY(MessageType type, const string& username, const string& result
             id_json["type"] = "NEW_USER";
             id_json["username"] = username;
             break;
-        case RESPONSE:
+        case RESPONSE: //maybe make method makeRESPONSE
             id_json["type"] = "RESPONSE";
             id_json["operation"] = "IDENTIFY";
             id_json["result"] = result;

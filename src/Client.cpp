@@ -26,26 +26,27 @@ private:
                 string received(buffer);
                 string n(buffer);
                 if (received.front() == '{' && received.back() == '}') {
+                    cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = StringToJSON(received);
                     string message_type = json_msg["type"];
                     if (message_type == "RESPONSE") {
                     string result = json_msg["result"];
                     if (result == "SUCCESS") {
-                        cout << "SUCCESS" << endl;
+                        cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
                     } else if (result == "USER_ALREADY_EXISTS") {
-                        cout << "User already exist" << endl;
+                        cout << "El nombre de usuario ya está en uso." << endl;
                         break;
                     } else if (result == "NOT_IDENTIFIED") {
-                        cout << "Username more than 8 characters" << endl;
+                        cout << "Sigue las reglas porfa" << endl;
                         exit(0);
                     }
                 } else if (message_type == "NEW_USER") {
                     user_name = json_msg["username"];
-                    cout << "New user: " << user_name << endl; 
+                    cout << "Nuevo usuario conectado: " << status << user_name << endl; 
                 }
 
                 } else {
-                    cout << n;
+                    cout <<"Mensaje no json: " << n;
                 }
             } else if (bytes_read == 0) {
                 close(sock);
@@ -59,12 +60,14 @@ private:
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
         if (type == PUBLIC_TEXT_FROM) cout << status<< "Tú: " << message << endl;
+        cout<<"Mensaje enviado json: " << msg << endl;
     }
 
     void sendIdentify(MessageType type, string message){
         json json_msg = makeIDENTIFY(type, message);
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
+        cout<<"Mensaje enviado json: " << msg << endl;
     }
 
 public:

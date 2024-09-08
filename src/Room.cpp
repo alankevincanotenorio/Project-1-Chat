@@ -11,15 +11,22 @@ using namespace std;
 class Room {
 private:
     string name;
-    unique_ptr<unordered_map<string, tuple<string, int>>> clients;
+    
+    struct ClientData {
+        string status;
+        int socket_fd;
+    };
+
+    unique_ptr<unordered_map<string, ClientData>> clients;
+    
 
 public:
-    Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, tuple<string, int>>>()) {}
+    Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, ClientData>>()) {}
 
     void addClient(int client_socket, const string& success) {
         json response = StringToJSON(success);
         string username = response["extra"];
-        (*clients)[username] = make_tuple("ACTIVE", client_socket);
+        (*clients)[username] = {"ACTIVE", client_socket};
         json nu = makeIDENTIFY(NEW_USER, username);
         string m = JSONToString(nu);
         sendMsgToRoom(m, client_socket);
@@ -27,7 +34,7 @@ public:
 
     void removeClient(int client_socket, const string& username) {
         auto it = clients->find(username);
-        if (it != clients->end() && get<1>(it->second) == client_socket) {
+        if (it != clients->end() && it->second.socket_fd == client_socket) {
             clients->erase(it);
             string leave_msg = username + " has left the room.";
             sendMsgToRoom(leave_msg, client_socket);
@@ -40,8 +47,8 @@ public:
         if(message.front() == '{' && message.back() == '}') msg = message; //por esta linea falla, primero tendre que procesar un json y luego otro
         else msg = message + "\n";
         for (const auto& [username, client_info] : *clients) {
-            int client_socket = get<1>(client_info);
-            if (client_socket != socket_sender) send(client_socket, msg.c_str(), msg.size(), 0);
+            if (client_info.socket_fd != socket_sender) 
+                send(client_info.socket_fd, msg.c_str(), msg.size(), 0);
         }
     }
 
@@ -55,6 +62,6 @@ public:
     }
 
     string getStatus(const string& username){
-        return get<0>((*clients)[username]);
+        return (*clients)[username].status;
     }
 };
