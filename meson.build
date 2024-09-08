@@ -10,8 +10,8 @@ gtest_dep = dependency('gtest', required: true)
 gtest_main_dep = dependency('gtest_main', required: true)
 
 # Create the executables in the 'bin' folder
-main_client_executable = executable(bin_dir / 'main_client', src_dir / 'main_client.cpp')
-main_server_executable = executable(bin_dir / 'main_server', src_dir / 'main_server.cpp')
+mainClient_executable = executable(bin_dir / 'mainClient', src_dir / 'mainClient.cpp')
+mainServer_executable = executable(bin_dir / 'mainServer', src_dir / 'mainServer.cpp')
 
 # Test
 test_executable = executable('test_server', tests_dir / 'test_server.cpp',

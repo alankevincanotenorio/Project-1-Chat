@@ -29,9 +29,9 @@ Antes de configurar y compilar el proyecto, asegúrate de tener las siguientes h
 4. **Ejecutar el proyecto**
     ```bash
     Servidor: 
-        ./build/bin/servidor
+        ./build/bin/mainServer
     Despues de ejecutar el servidor, en otra terminal ejecutas el cliente:
-        ./build/bin/cliente
+        ./build/bin/mainClient
 
 5. **Pruebas unitarias el proyecto**
     ```bash

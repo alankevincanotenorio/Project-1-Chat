@@ -1,1 +1,0 @@
-[{"cmd": ["/home/alan/Downloads/prg/chat/Project-1-Chat/build/test_server"], "env": {}, "name": "test_server", "workdir": null, "timeout": 30, "suite": ["Chat_client-server"], "is_parallel": true, "priority": 0, "protocol": "exitcode", "depends": ["test_server@exe"]}]
