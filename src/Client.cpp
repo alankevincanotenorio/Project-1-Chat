@@ -12,7 +12,7 @@ class Client {
 private:
     int sock = 0;
     struct sockaddr_in serv_addr;
-    string ip;
+    string server_ip;
     int server_port;
     unique_ptr <thread> receiveThread;
 
@@ -70,13 +70,14 @@ private:
 public:
     string user_name;
     string status;
-    Client(const string &ip, int port) : ip(ip), server_port(port) {}
+
+    Client(const string &server_ip, int port) : server_ip(server_ip), server_port(port) {}
 
     int connectToServer() {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(server_port);
-        inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr);
+        inet_pton(AF_INET, server_ip.c_str(), &serv_addr.sin_addr);
         if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
             cout << "Server not connected" << endl;
             return -1;
