@@ -101,7 +101,8 @@ public:
             json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
             string s = JSONToString(r);
             send(client_socket, s.c_str(), s.size(), 0);
-            close(client_socket); return false;
+            close(client_socket); 
+            return false;
         }
         string n = generalRoom->getUserRegister(u);
         if (n != "NO_SUCH_USER") return false;

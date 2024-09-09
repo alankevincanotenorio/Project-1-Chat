@@ -35,7 +35,8 @@ private:
                         cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
                     } else if (result == "USER_ALREADY_EXISTS") {
                         cout << "El nombre de usuario ya está en uso." << endl;
-                        break;
+                        close(sock);
+                        exit(0);
                     } else if (result == "NOT_IDENTIFIED") {
                         cout << "Sigue las reglas porfa" << endl;
                         exit(0);
@@ -92,7 +93,13 @@ public:
 
     void connection(){
         cout << "Hello, please insert your username (max. 8 characters)" << endl;
-        getline(cin, user_name);
+        string input;
+        getline(cin, input);
+        if(input.substr(0, 3) != "id " || input.substr(3).empty()){
+            cout << "no ingresaste el comando para identificarte" << endl;
+            exit(0);
+        } 
+        string user_name = input.substr(3);
         sendIdentify(IDENTIFY, user_name);
         while (true) {
             string message;
