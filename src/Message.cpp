@@ -93,6 +93,25 @@ json makeINVALID(MessageType type, const string& result) {
     return id_json;
 }
 
+json makeSTATUS(MessageType type, const string& result, const string& username = "") {
+    json id_json;
+    switch(type) {
+        case STATUS:
+            id_json["type"] = "STATUS";
+            id_json["status"] = result;
+            break;
+        case NEW_STATUS:
+            id_json["type"] = "NEW_STATUS";
+            id_json["username"] = username;
+            id_json["status"] = result;
+            break;
+        default:
+            cout << "Error: Tipo de mensaje de estado no soportado" << endl;
+    }
+    return id_json;
+}
+
+
 //serializar
 string JSONToString(const json& j){
     string jsonMessage = j.dump();

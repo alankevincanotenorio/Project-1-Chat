@@ -44,8 +44,10 @@ private:
                 } else if (message_type == "NEW_USER") {
                     user_name = json_msg["username"];
                     cout << "Nuevo usuario conectado: " << status << user_name << endl; 
+                }  else if (message_type == "NEW_STATUS") {
+                    user_name = json_msg["username"];
+                    cout << "Nuevo estado actualizado: " << status << user_name << endl; 
                 }
-
                 } else {
                     cout <<"Mensaje no json: " << n;
                 }
@@ -71,6 +73,13 @@ private:
         cout<<"Mensaje enviado json: " << msg << endl;
     }
 
+    void sendStatus(MessageType type, string message){
+        json json_msg = makeSTATUS(type, message);
+        string msg = JSONToString(json_msg);
+        send(sock, msg.c_str(), msg.size(), 0);
+        cout<<"Mensaje enviado json: " << msg << endl;
+    }
+
 public:
     string user_name;
     string status;
@@ -91,21 +100,36 @@ public:
         return 0;
     }
 
-    void connection(){
+    void connection() {
         cout << "Hello, please insert your username (max. 8 characters)" << endl;
         string input;
         getline(cin, input);
-        if(input.substr(0, 3) != "id " || input.substr(3).empty()){
+        if(input.substr(0, 3) != "id "){
             cout << "no ingresaste el comando para identificarte" << endl;
             exit(0);
         } 
         string user_name = input.substr(3);
+        if(user_name.empty()){
+            cout << "no ingresaste el comando para identificarte" << endl;
+            exit(0);
+        }
         sendIdentify(IDENTIFY, user_name);
+        
         while (true) {
             string message;
             getline(cin, message);
-            sendMessage(PUBLIC_TEXT_FROM, message);
+            if(message.substr(0, 4) == "sts ") {
+                string new_status = message.substr(4);
+                if(new_status == "ACTIVE" || new_status == "AWAY" || new_status == "BUSY") {
+                    sendStatus(STATUS, new_status);
+                } else {
+                    cout << "Estado inválido. Usa 'ACTIVE', 'AWAY' o 'BUSY'." << endl;
+                }
+            } else {
+                sendMessage(PUBLIC_TEXT_FROM, message);
+            }
         }
     }
+
 
 };

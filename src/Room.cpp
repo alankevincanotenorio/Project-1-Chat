@@ -51,6 +51,16 @@ public:
         }
     }
 
+    void updateStatus(const string& username, const string& new_status) {
+        auto it = clients->find(username);
+        if (it != clients->end()) {
+            it->second.status = new_status;
+            json status_msg = makeSTATUS(NEW_STATUS, new_status, username);
+            string msg = JSONToString(status_msg);
+            sendMsgToRoom(msg, it->second.socket_fd);
+        }
+    }
+
     string getName() const {
         return name;
     }
