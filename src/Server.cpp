@@ -131,6 +131,8 @@ public:
             generalRoom->updateStatus(username, new_status);
         }  else if (message_type == "USERS") {
             generalRoom->sendUserList(client_socket);
+        } else if (message_type == "DISCONNECT") {
+            generalRoom->removeClient(client_socket, username);
         }
     }
 

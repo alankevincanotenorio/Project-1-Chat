@@ -32,14 +32,17 @@ public:
     }
 
     void removeClient(int client_socket, const string& username) {
-        auto it = clients->find(username);
-        if (it != clients->end() && it->second.socket_fd == client_socket) {
-            clients->erase(it);
-            string leave_msg = username + " has left the room.";
-            sendMsgToRoom(leave_msg, client_socket);
-            close(client_socket);
-        }
+    // Crear y enviar el mensaje LEFT_ROOM si el usuario está en un cuarto falta implementarlo
+    auto it = clients->find(username);
+    if (it != clients->end() && it->second.socket_fd == client_socket) {
+        clients->erase(it);
+        json disconnected_msg = makeDISCONNECT(DISCONNECTED, "", username);
+        string disconnected_str = JSONToString(disconnected_msg);
+        sendMsgToRoom(disconnected_str, client_socket);
+        close(client_socket);
     }
+}
+
 
     void sendMsgToRoom(const string& message, int socket_sender) {
         string msg;
@@ -82,6 +85,11 @@ public:
         json user_list_msg = makeUSERS(USER_LIST, users);
         string user_list_str = JSONToString(user_list_msg);
         send(client_socket, user_list_str.c_str(), user_list_str.size(), 0);
+    }
+
+
+    bool isUserInRoom(const string& username) {
+        return clients->find(username) != clients->end();
     }
 
 

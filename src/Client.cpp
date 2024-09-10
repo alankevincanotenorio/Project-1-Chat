@@ -63,6 +63,9 @@ private:
             string st = user_status_map[n];
             if(st.empty()) st = "\U0001F600";
             cout << st << n << ": " << text << endl;
+        }  else if(message_type == "DISCONNECTED"){
+            string n = json_msg["username"];
+            cout << n << " has been disconnected" << endl;
         }
         else {
             cout << "Tipo de mensaje no reconocido: " << message_type << endl;
@@ -104,6 +107,9 @@ private:
                 break;
             case PUBLIC_TEXT:
                 json_msg = makePbtext(type, message);
+                break;
+            case DISCONNECT:
+                json_msg = makeDISCONNECT(type);
                 break;
             default:
                 cout <<"no mandaste un mensaje json";
@@ -149,6 +155,11 @@ private:
                 exit(0);
             }
             sendMessage(PUBLIC_TEXT, message);
+        } else if (input == "exit") {
+            sendMessage(DISCONNECT, "");
+            close(sock);
+            cout << "Te has desconectado del servidor." << endl;
+            exit(0);
         }
         else {
             cout << "Mensaje invalido"<< endl; //eliminar cuando implemente Disconnected

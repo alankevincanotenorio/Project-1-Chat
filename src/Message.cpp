@@ -122,6 +122,27 @@ json makePbtext(MessageType type, string message, string username = ""){
 }
 
 
+json makeDISCONNECT(MessageType type, string roomname = "", string username = "") {
+    json id_json;
+    switch(type) {
+        case DISCONNECT:
+            id_json["type"] = "DISCONNECT";
+            break;
+        case DISCONNECTED:
+            id_json["type"] = "DISCONNECTED";
+            id_json["username"] = username;
+            break;
+        case LEFT_ROOM:
+            id_json["type"] = "LEFT_ROOM";
+            id_json["roomname"] = roomname;
+            id_json["username"] = username;
+            break;
+        default:
+            cout << "Error: Tipo de mensaje de estado no soportado" << endl;
+    }
+    return id_json;
+}
+
 //serializar
 string JSONToString(const json& j){
     string jsonMessage = j.dump();
