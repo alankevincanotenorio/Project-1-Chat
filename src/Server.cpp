@@ -16,12 +16,13 @@ private:
     int opt = 1;
     int addrlen = sizeof(address);
     int port;
+    string ipAddress;
     unique_ptr<Room> generalRoom;
     unique_ptr<unordered_map<int, int>> clients_sockets;
     unique_ptr<unordered_map<string, Room>> rooms;
 
 public:
-    Server(int port) : port(port) {}
+    Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {}
 
     //maybe erase if
     void initSocket() {
