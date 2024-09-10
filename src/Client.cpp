@@ -16,6 +16,9 @@ private:
     int server_port;
     unique_ptr <thread> receiveThread;
 
+    unordered_map<string, string> user_status_map; //guarda los nuevos estados para que sea posible imprimirlos
+
+
     //chage to switch case
     void handleMessageType(const json& json_msg) {
         string message_type = json_msg["type"];
@@ -23,7 +26,7 @@ private:
             string result = json_msg["result"];
             if (result == "SUCCESS") {
                 user_name = json_msg["extra"];
-                status = "\U0001F600";
+                setStatus("ACTIVE");
                 cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
             } else if (result == "USER_ALREADY_EXISTS") {
                 cout << "El nombre de usuario ya está en uso." << endl;
@@ -40,11 +43,14 @@ private:
 
         } else if (message_type == "NEW_STATUS") {
             string s = json_msg["status"];
-            if (s == "ACTIVE") status = "\U0001F600";
-            if (s == "BUSY") status = "\U0001F623";
-            if (s == "AWAY") status = "\U0001F914";
             string user_name = json_msg["username"];
-            cout << "Nuevo estado actualizado: " << status << user_name << endl; 
+            updateUserStatusMap(user_name, s);
+            if (user_name != this->user_name) {
+                cout << "Nuevo estado actualizado: " << user_status_map[user_name] << user_name << endl;
+            } else {
+                setStatus(s);
+                cout << "Tu estado ha sido actualizado a: " << status << endl;
+            }
         }  else if (message_type == "USER_LIST") {
             json users_json = json_msg["users"];
             cout << "Lista de usuarios en la sala:" << endl;
@@ -54,7 +60,9 @@ private:
         } else if(message_type == "PUBLIC_TEXT_FROM"){
             string text = json_msg["text"];
             string n = json_msg["username"];
-            cout << status << n << ": " << text << endl;
+            string st = user_status_map[n];
+            if(st.empty()) st = "\U0001F600";
+            cout << st << n << ": " << text << endl;
         }
         else {
             cout << "Tipo de mensaje no reconocido: " << message_type << endl;
@@ -178,5 +186,23 @@ public:
             checkCommand(input);
         }
     }
+
+    void setStatus(string stats){
+        if (stats == "ACTIVE") status = "\U0001F600";
+        else if (stats == "BUSY") status = "\U0001F623";
+        else if (stats == "AWAY") status = "\U0001F914";
+    }
+
+    void updateUserStatusMap(const string& username, const string& new_status) {
+        if (new_status == "ACTIVE") {
+            user_status_map[username] = "\U0001F600";  // 😀
+        } else if (new_status == "BUSY") {
+            user_status_map[username] = "\U0001F623";  // 😥
+        } else if (new_status == "AWAY") {
+            user_status_map[username] = "\U0001F914";  // 🤔
+        }
+    }
+
+
 
 };
