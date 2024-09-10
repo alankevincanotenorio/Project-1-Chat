@@ -123,7 +123,7 @@ public:
                 close(client_socket);
                 return;
             }
-            json response = makePbtext(PUBLIC_TEXT_FROM, message);
+            json response = makePbtext(PUBLIC_TEXT_FROM, message, username);
             string r = JSONToString(response);
             generalRoom->sendMsgToRoom(r, client_socket);
         } else if (message_type == "STATUS") {

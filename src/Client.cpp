@@ -22,6 +22,8 @@ private:
         if (message_type == "RESPONSE") {
             string result = json_msg["result"];
             if (result == "SUCCESS") {
+                user_name = json_msg["extra"];
+                status = "\U0001F600";
                 cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
             } else if (result == "USER_ALREADY_EXISTS") {
                 cout << "El nombre de usuario ya está en uso." << endl;
@@ -37,9 +39,10 @@ private:
             cout << "Nuevo usuario conectado: " << status << user_name << endl; 
 
         } else if (message_type == "NEW_STATUS") {
-            if (status == "ACTIVE") status = "\U0001F600";
-            if (status == "BUSY") status = "\U0001F623";
-            if (status == "AWAY") status = "\U0001F914";
+            string s = json_msg["status"];
+            if (s == "ACTIVE") status = "\U0001F600";
+            if (s == "BUSY") status = "\U0001F623";
+            if (s == "AWAY") status = "\U0001F914";
             string user_name = json_msg["username"];
             cout << "Nuevo estado actualizado: " << status << user_name << endl; 
         }  else if (message_type == "USER_LIST") {
@@ -50,7 +53,8 @@ private:
             }
         } else if(message_type == "PUBLIC_TEXT_FROM"){
             string text = json_msg["text"];
-            cout << status << user_name << ": " << text << endl;
+            string n = json_msg["username"];
+            cout << status << n << ": " << text << endl;
         }
         else {
             cout << "Tipo de mensaje no reconocido: " << message_type << endl;
@@ -100,7 +104,7 @@ private:
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
         if (type == PUBLIC_TEXT) {
-            cout << status << "Tú: " << message << endl;
+            cout << status << " " << user_name << ": " << message << endl;
         }
         cout << "Mensaje enviado json: " << msg << endl;
     }
@@ -131,11 +135,15 @@ private:
         }
         //public message
         else if(input.substr(0, 3) == "pb "){
-            string message = input.substr(3);  // Extraer el texto después de "pb "
-            sendMessage(PUBLIC_TEXT, message);  // Enviar el mensaje de texto público
+            string message = input.substr(3);
+            if (message.empty()) {
+                cout << "No ingresaste el mensaje" << endl;
+                exit(0);
+            }
+            sendMessage(PUBLIC_TEXT, message);
         }
         else {
-            cout << "Mensaje invalido";
+            cout << "Mensaje invalido"<< endl; //eliminar cuando implemente Disconnected
         }
     }
 
