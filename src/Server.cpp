@@ -15,16 +15,17 @@ private:
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    int port;
-    string ipAddress;
     unique_ptr<Room> generalRoom;
     unique_ptr<unordered_map<int, int>> clients_sockets;
     unique_ptr<unordered_map<string, Room>> rooms;
 
 public:
+    string ipAddress;
+    int port;
     Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {}
 
     //maybe erase if
+    
     void initSocket() {
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd == -1) {
@@ -65,8 +66,7 @@ public:
         }
     }
 
-    //only left send a json to client
-    //tener metodo validjson para ver si es un json correcto o nel
+    
     void handleClient(int client_socket) {
         char buffer[512] = {0};
         if (userRegister(buffer, client_socket)) {
@@ -75,26 +75,7 @@ public:
                 int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
                 if (bytes_read <= 0) break;
                 buffer[bytes_read] = '\0';
-                string msg(buffer);
-
-                json json_msg = StringToJSON(msg);
-                string message_type = json_msg["type"];
-                if (message_type == "PUBLIC_TEXT_FROM") {
-                    string message = getData(buffer, "text");
-                    if (message == "exit") {
-                        generalRoom->removeClient(client_socket, username);
-                        close(client_socket);
-                        break;
-                    }
-                    string status = generalRoom->getStatus(username);
-                    if(status == "ACTIVE") status = "\U0001F600";
-                    if(status == "BUSY") status = "\U0001F623";
-                    if(status == "AWAY") status = "\U0001F914";
-                    generalRoom->sendMsgToRoom( status + username + ": " + message, client_socket);
-                } else if (message_type == "STATUS") {
-                    string new_status = json_msg["status"];
-                    generalRoom->updateStatus(username, new_status); 
-                }
+                sendMsg(buffer, username, client_socket);
             }
         } else {
             json response = makeIDENTIFY(RESPONSE, getData(buffer, "username"), "USER_ALREADY_EXISTS");
@@ -129,6 +110,28 @@ public:
         }
     }
 
+
+    void sendMsg(char buffer[], const string& username, int client_socket) {
+        string msg(buffer);
+        json json_msg = StringToJSON(msg);
+        string message_type = json_msg["type"];
+        if (message_type == "PUBLIC_TEXT_FROM") {
+            string message = getData(buffer, "text");
+            if (message == "exit") {
+                generalRoom->removeClient(client_socket, username);
+                close(client_socket);
+                return;
+            }
+            string status = generalRoom->getStatus(username);
+            if (status == "ACTIVE") status = "\U0001F600";
+            if (status == "BUSY") status = "\U0001F623";
+            if (status == "AWAY") status = "\U0001F914";
+            generalRoom->sendMsgToRoom(status + username + ": " + message, client_socket);
+        } else if (message_type == "STATUS") {
+            string new_status = json_msg["status"];
+            generalRoom->updateStatus(username, new_status);
+        }
+    }
 
 
     //modify

@@ -16,7 +16,34 @@ private:
     int server_port;
     unique_ptr <thread> receiveThread;
 
-    //cambiar por un switch y el switch hacerlo en otro metodo
+    //chage to switch case
+    void handleMessageType(const json& json_msg) {
+        string message_type = json_msg["type"];
+        if (message_type == "RESPONSE") {
+            string result = json_msg["result"];
+            if (result == "SUCCESS") {
+                cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
+            } else if (result == "USER_ALREADY_EXISTS") {
+                cout << "El nombre de usuario ya está en uso." << endl;
+                close(sock);
+                exit(0);
+            } else if (result == "NOT_IDENTIFIED") {
+                cout << "Sigue las reglas porfa" << endl;
+                close(sock);
+                exit(0);
+            }
+        } else if (message_type == "NEW_USER") {
+            string user_name = json_msg["username"];
+            cout << "Nuevo usuario conectado: " << status << user_name << endl; 
+
+        } else if (message_type == "NEW_STATUS") {
+            string user_name = json_msg["username"];
+            cout << "Nuevo estado actualizado: " << status << user_name << endl; 
+        } else {
+            cout << "Tipo de mensaje no reconocido: " << message_type << endl;
+        }
+    }
+
     void receiveMessages() {
         char buffer[512] = {0};
         while (true) {
@@ -24,32 +51,12 @@ private:
             if (bytes_read > 0) {
                 buffer[bytes_read] = '\0';
                 string received(buffer);
-                string n(buffer);
                 if (received.front() == '{' && received.back() == '}') {
                     cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = StringToJSON(received);
-                    string message_type = json_msg["type"];
-                    if (message_type == "RESPONSE") {
-                    string result = json_msg["result"];
-                    if (result == "SUCCESS") {
-                        cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
-                    } else if (result == "USER_ALREADY_EXISTS") {
-                        cout << "El nombre de usuario ya está en uso." << endl;
-                        close(sock);
-                        exit(0);
-                    } else if (result == "NOT_IDENTIFIED") {
-                        cout << "Sigue las reglas porfa" << endl;
-                        exit(0);
-                    }
-                } else if (message_type == "NEW_USER") {
-                    user_name = json_msg["username"];
-                    cout << "Nuevo usuario conectado: " << status << user_name << endl; 
-                }  else if (message_type == "NEW_STATUS") {
-                    user_name = json_msg["username"];
-                    cout << "Nuevo estado actualizado: " << status << user_name << endl; 
-                }
+                    handleMessageType(json_msg);
                 } else {
-                    cout <<"Mensaje no json: " << n;
+                    cout << "Mensaje no JSON recibido: " << received;
                 }
             } else if (bytes_read == 0) {
                 close(sock);
@@ -58,27 +65,49 @@ private:
         }
     }
 
-    void sendMessage(MessageType type, string message){
-        json json_msg = makeJSON(type, message);
+    void sendMessage(MessageType type, const string& message) {
+        json json_msg;
+        switch (type) {
+            case IDENTIFY:
+                json_msg = makeIDENTIFY(type, message);
+                break;
+            case STATUS:
+                json_msg = makeSTATUS(type, message);
+                break;
+            default:
+                json_msg = makeJSON(type, message);
+                break;
+        }
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
-        if (type == PUBLIC_TEXT_FROM) cout << status<< "Tú: " << message << endl;
-        cout<<"Mensaje enviado json: " << msg << endl;
+        if (type == PUBLIC_TEXT_FROM) {
+            cout << status << "Tú: " << message << endl;
+        }
+        cout << "Mensaje enviado json: " << msg << endl;
     }
 
-    void sendIdentify(MessageType type, string message){
-        json json_msg = makeIDENTIFY(type, message);
-        string msg = JSONToString(json_msg);
-        send(sock, msg.c_str(), msg.size(), 0);
-        cout<<"Mensaje enviado json: " << msg << endl;
+    void checkCommand(const string& input) {
+        if (input.substr(0, 3) == "id ") {
+            string user_name = input.substr(3);
+            if (user_name.empty()) {
+                cout << "No ingresaste el comando para identificarte" << endl;
+                exit(0);
+            }
+            sendMessage(IDENTIFY, user_name);
+        }
+        else if (input.substr(0, 4) == "sts ") {
+            string new_status = input.substr(4);
+            if (new_status == "ACTIVE" || new_status == "AWAY" || new_status == "BUSY") {
+                sendMessage(STATUS, new_status);
+            } else {
+                cout << "Estado inválido. Usa 'ACTIVE', 'AWAY' o 'BUSY'." << endl;
+            }
+        }
+        else {
+            sendMessage(PUBLIC_TEXT_FROM, input);
+        }
     }
 
-    void sendStatus(MessageType type, string message){
-        json json_msg = makeSTATUS(type, message);
-        string msg = JSONToString(json_msg);
-        send(sock, msg.c_str(), msg.size(), 0);
-        cout<<"Mensaje enviado json: " << msg << endl;
-    }
 
 public:
     string user_name;
@@ -104,32 +133,11 @@ public:
         cout << "Hello, please insert your username (max. 8 characters)" << endl;
         string input;
         getline(cin, input);
-        if(input.substr(0, 3) != "id "){
-            cout << "no ingresaste el comando para identificarte" << endl;
-            exit(0);
-        } 
-        string user_name = input.substr(3);
-        if(user_name.empty()){
-            cout << "no ingresaste el comando para identificarte" << endl;
-            exit(0);
-        }
-        sendIdentify(IDENTIFY, user_name);
-        
+        checkCommand(input);
         while (true) {
-            string message;
-            getline(cin, message);
-            if(message.substr(0, 4) == "sts ") {
-                string new_status = message.substr(4);
-                if(new_status == "ACTIVE" || new_status == "AWAY" || new_status == "BUSY") {
-                    sendStatus(STATUS, new_status);
-                } else {
-                    cout << "Estado inválido. Usa 'ACTIVE', 'AWAY' o 'BUSY'." << endl;
-                }
-            } else {
-                sendMessage(PUBLIC_TEXT_FROM, message);
-            }
+            getline(cin, input);
+            checkCommand(input);
         }
     }
-
 
 };
