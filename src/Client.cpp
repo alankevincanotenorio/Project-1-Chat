@@ -37,15 +37,20 @@ private:
             cout << "Nuevo usuario conectado: " << status << user_name << endl; 
 
         } else if (message_type == "NEW_STATUS") {
+            if (status == "ACTIVE") status = "\U0001F600";
+            if (status == "BUSY") status = "\U0001F623";
+            if (status == "AWAY") status = "\U0001F914";
             string user_name = json_msg["username"];
             cout << "Nuevo estado actualizado: " << status << user_name << endl; 
         }  else if (message_type == "USER_LIST") {
-            // Procesar la lista de usuarios y sus estados
             json users_json = json_msg["users"];
             cout << "Lista de usuarios en la sala:" << endl;
             for (auto& [username, status] : users_json.items()) {
                 cout << username << ": " << status << endl;
             }
+        } else if(message_type == "PUBLIC_TEXT_FROM"){
+            string text = json_msg["text"];
+            cout << status << user_name << ": " << text << endl;
         }
         else {
             cout << "Tipo de mensaje no reconocido: " << message_type << endl;
@@ -85,18 +90,22 @@ private:
             case USERS:
                 json_msg = makeUSERS(type);
                 break;
+            case PUBLIC_TEXT:
+                json_msg = makePbtext(type, message);
+                break;
             default:
-                json_msg = makeJSON(type, message);
+                cout <<"no mandaste un mensaje json";
                 break;
         }
         string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
-        if (type == PUBLIC_TEXT_FROM) {
+        if (type == PUBLIC_TEXT) {
             cout << status << "Tú: " << message << endl;
         }
         cout << "Mensaje enviado json: " << msg << endl;
     }
 
+    //maybe tener una enum
     void checkCommand(const string& input) {
         //id
         if (input.substr(0, 3) == "id ") {
@@ -120,8 +129,13 @@ private:
         else if(input.substr(0, 6) == "users"){
             sendMessage(USERS, "");
         }
+        //public message
+        else if(input.substr(0, 3) == "pb "){
+            string message = input.substr(3);  // Extraer el texto después de "pb "
+            sendMessage(PUBLIC_TEXT, message);  // Enviar el mensaje de texto público
+        }
         else {
-            sendMessage(PUBLIC_TEXT_FROM, input);
+            cout << "Mensaje invalido";
         }
     }
 

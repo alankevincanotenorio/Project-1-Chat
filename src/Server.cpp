@@ -116,18 +116,16 @@ public:
         string msg(buffer);
         json json_msg = StringToJSON(msg);
         string message_type = json_msg["type"];
-        if (message_type == "PUBLIC_TEXT_FROM") {
-            string message = getData(buffer, "text");
+        if (message_type == "PUBLIC_TEXT") {
+            string message = json_msg["text"];
             if (message == "exit") {
                 generalRoom->removeClient(client_socket, username);
                 close(client_socket);
                 return;
             }
-            string status = generalRoom->getStatus(username);
-            if (status == "ACTIVE") status = "\U0001F600";
-            if (status == "BUSY") status = "\U0001F623";
-            if (status == "AWAY") status = "\U0001F914";
-            generalRoom->sendMsgToRoom(status + username + ": " + message, client_socket);
+            json response = makePbtext(PUBLIC_TEXT_FROM, message);
+            string r = JSONToString(response);
+            generalRoom->sendMsgToRoom(r, client_socket);
         } else if (message_type == "STATUS") {
             string new_status = json_msg["status"];
             generalRoom->updateStatus(username, new_status);

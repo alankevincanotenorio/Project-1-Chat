@@ -32,36 +32,6 @@ enum MessageType{
     DISCONNECTED,
 };
 
-//make the others json
-//String to json
-json makeJSON(MessageType type, string message){
-    json id_json;
-    switch(type){
-        case IDENTIFY:
-            id_json["type"] = "IDENTIFY";
-            id_json["username"] = message;
-            break;
-        case RESPONSE:
-            id_json["type"] = "RESPONSE";
-            id_json["operation"] = "IDENTIFY";
-            id_json["result"] = "USER_ALREADY_EXISTS";
-            id_json["extra"] = message;
-            break;
-        case NEW_USER:
-            id_json["type"] = "NEW_USER";
-            id_json["username"] = message;
-            break;
-        case PUBLIC_TEXT_FROM:
-            id_json["type"] = "PUBLIC_TEXT_FROM";
-            id_json["username"] = "Kimberly";
-            id_json["text"] = message;
-            break;
-        default:
-            break;
-    }
-    return id_json;
-}
-
 json makeIDENTIFY(MessageType type, const string& username, const string& result = "") {
     json id_json;
     switch(type) {
@@ -116,7 +86,7 @@ json makeUSERS(MessageType type, const unordered_map<string, string>& users = {}
     json users_json;
     switch(type) {
         case USERS:
-            id_json["type"] = "USERS";  // Mensaje de solicitud de usuarios
+            id_json["type"] = "USERS";
             break;
         case USER_LIST:
             id_json["type"] = "USER_LIST";
@@ -132,6 +102,24 @@ json makeUSERS(MessageType type, const unordered_map<string, string>& users = {}
     return id_json;
 }
 
+json makePbtext(MessageType type, string message, string username = ""){
+    json id_json;
+    switch(type){
+        case PUBLIC_TEXT:
+            id_json["type"] = "PUBLIC_TEXT";
+            id_json["text"] = message;
+            break;
+        case PUBLIC_TEXT_FROM:
+            id_json["type"] = "PUBLIC_TEXT_FROM";
+            id_json["username"] = username;
+            id_json["text"] = message;
+            break;
+        default:
+            cout << "Error: Tipo de mensaje no soportado" << endl;
+            break;
+    }
+    return id_json;
+}
 
 
 //serializar
