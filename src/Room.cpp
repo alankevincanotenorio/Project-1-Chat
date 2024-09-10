@@ -43,7 +43,7 @@ public:
 
     void sendMsgToRoom(const string& message, int socket_sender) {
         string msg;
-        if(message.front() == '{' && message.back() == '}') msg = message; //por esta linea falla, primero tendre que procesar un json y luego otro
+        if(message.front() == '{' && message.back() == '}') msg = message;
         else msg = message + "\n";
         for (const auto& [username, client_info] : *clients) {
             if (client_info.socket_fd != socket_sender) 
@@ -73,4 +73,16 @@ public:
     string getStatus(const string& username){
         return (*clients)[username].status;
     }
+
+    void sendUserList(int client_socket) {
+        unordered_map<string, string> users;
+        for (const auto& [username, client_info] : *clients) {
+            users[username] = client_info.status;
+        }
+        json user_list_msg = makeUSERS(USER_LIST, users);
+        string user_list_str = JSONToString(user_list_msg);
+        send(client_socket, user_list_str.c_str(), user_list_str.size(), 0);
+    }
+
+
 };

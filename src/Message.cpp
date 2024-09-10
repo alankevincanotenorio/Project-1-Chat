@@ -111,6 +111,28 @@ json makeSTATUS(MessageType type, const string& result, const string& username =
     return id_json;
 }
 
+json makeUSERS(MessageType type, const unordered_map<string, string>& users = {}) {
+    json id_json;
+    json users_json;
+    switch(type) {
+        case USERS:
+            id_json["type"] = "USERS";  // Mensaje de solicitud de usuarios
+            break;
+        case USER_LIST:
+            id_json["type"] = "USER_LIST";
+            for (const auto& [username, status] : users) {
+                users_json[username] = status;
+            }
+            id_json["users"] = users_json;
+            break;
+        default:
+            cout << "Error: Tipo de mensaje no soportado" << endl;
+            break;
+    }
+    return id_json;
+}
+
+
 
 //serializar
 string JSONToString(const json& j){

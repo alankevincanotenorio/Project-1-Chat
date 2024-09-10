@@ -39,7 +39,15 @@ private:
         } else if (message_type == "NEW_STATUS") {
             string user_name = json_msg["username"];
             cout << "Nuevo estado actualizado: " << status << user_name << endl; 
-        } else {
+        }  else if (message_type == "USER_LIST") {
+            // Procesar la lista de usuarios y sus estados
+            json users_json = json_msg["users"];
+            cout << "Lista de usuarios en la sala:" << endl;
+            for (auto& [username, status] : users_json.items()) {
+                cout << username << ": " << status << endl;
+            }
+        }
+        else {
             cout << "Tipo de mensaje no reconocido: " << message_type << endl;
         }
     }
@@ -74,6 +82,9 @@ private:
             case STATUS:
                 json_msg = makeSTATUS(type, message);
                 break;
+            case USERS:
+                json_msg = makeUSERS(type);
+                break;
             default:
                 json_msg = makeJSON(type, message);
                 break;
@@ -87,6 +98,7 @@ private:
     }
 
     void checkCommand(const string& input) {
+        //id
         if (input.substr(0, 3) == "id ") {
             string user_name = input.substr(3);
             if (user_name.empty()) {
@@ -95,6 +107,7 @@ private:
             }
             sendMessage(IDENTIFY, user_name);
         }
+        //status
         else if (input.substr(0, 4) == "sts ") {
             string new_status = input.substr(4);
             if (new_status == "ACTIVE" || new_status == "AWAY" || new_status == "BUSY") {
@@ -102,6 +115,10 @@ private:
             } else {
                 cout << "Estado inválido. Usa 'ACTIVE', 'AWAY' o 'BUSY'." << endl;
             }
+        }
+        //users list
+        else if(input.substr(0, 6) == "users"){
+            sendMessage(USERS, "");
         }
         else {
             sendMessage(PUBLIC_TEXT_FROM, input);

@@ -32,6 +32,7 @@ public:
             cerr << "Error creating socket: " << strerror(errno) << endl;
             return;
         }
+        memset(&address, 0, sizeof(address));
         if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
             cerr << "Error configuring socket: " << strerror(errno) << endl;
             close(server_fd);
@@ -130,8 +131,11 @@ public:
         } else if (message_type == "STATUS") {
             string new_status = json_msg["status"];
             generalRoom->updateStatus(username, new_status);
+        }  else if (message_type == "USERS") {
+            generalRoom->sendUserList(client_socket);
         }
     }
+
 
 
     //modify
