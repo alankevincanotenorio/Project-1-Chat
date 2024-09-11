@@ -88,11 +88,15 @@ public:
     }
 
     //verify is a user is registered
+    //falta el try-catch para la excepcion
     bool userRegister(char username[], int client_socket){
         int bytes_read = read(client_socket, username, 512);
         username[bytes_read] = '\0';
         string u = getData(username, "username");
-        if(u.size() > 8) {
+
+        json json_msg = StringToJSON(username);
+        
+        if(u.size() > 8 || json_msg["type"] != "IDENTIFY" || u.size() == 0) {
             json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
             string s = JSONToString(r);
             send(client_socket, s.c_str(), s.size(), 0);
@@ -111,14 +115,14 @@ public:
         }
     }
 
-
+    //falta el try-catch para la excepcion
     void sendMsg(char buffer[], const string& username, int client_socket) {
         string msg(buffer);
         json json_msg = StringToJSON(msg);
         string message_type = json_msg["type"];
         if (message_type == "PUBLIC_TEXT") {
             string message = json_msg["text"];
-            if (message == "exit") {
+            if (message == "exit" || message.size() == 0) {
                 generalRoom->removeClient(client_socket, username);
                 close(client_socket);
                 return;
@@ -128,12 +132,20 @@ public:
             generalRoom->sendMsgToRoom(r, client_socket);
         } else if (message_type == "STATUS") {
             string new_status = json_msg["status"];
+            if ((new_status != "ACTIVE" && new_status != "AWAY" && new_status != "BUSY") || (new_status.size() == 0)) {
+                json invalid_response = makeINVALID(RESPONSE, "INVALID");
+                string response_str = JSONToString(invalid_response);
+                send(client_socket, response_str.c_str(), response_str.size(), 0);
+                generalRoom->removeClient(client_socket, username);
+                close(client_socket);
+                return;
+            }
             generalRoom->updateStatus(username, new_status);
         }  else if (message_type == "USERS") {
             generalRoom->sendUserList(client_socket);
         } else if (message_type == "DISCONNECT") {
             generalRoom->removeClient(client_socket, username);
-        }
+        } //checar los mensajes invalidos
     }
 
 

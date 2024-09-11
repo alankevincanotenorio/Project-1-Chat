@@ -18,6 +18,7 @@ private:
 
     unordered_map<string, string> user_status_map; //guarda los nuevos estados para que sea posible imprimirlos
 
+    bool is_identified = false;
 
     //chage to switch case
     void handleMessageType(const json& json_msg) {
@@ -25,6 +26,7 @@ private:
         if (message_type == "RESPONSE") {
             string result = json_msg["result"];
             if (result == "SUCCESS") {
+                is_identified = true;
                 user_name = json_msg["extra"];
                 setStatus("ACTIVE");
                 cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
@@ -34,6 +36,10 @@ private:
                 exit(0);
             } else if (result == "NOT_IDENTIFIED") {
                 cout << "Sigue las reglas porfa" << endl;
+                close(sock);
+                exit(0);
+            }  else if (result == "INVALID") {
+                cout << "Mensaje invalido" << endl;
                 close(sock);
                 exit(0);
             }
@@ -67,9 +73,6 @@ private:
             string n = json_msg["username"];
             cout << n << " has been disconnected" << endl;
         }
-        else {
-            cout << "Tipo de mensaje no reconocido: " << message_type << endl;
-        }
     }
 
     void receiveMessages() {
@@ -83,9 +86,10 @@ private:
                     cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = StringToJSON(received);
                     handleMessageType(json_msg);
-                } else {
-                    cout << "Mensaje no JSON recibido: " << received;
                 }
+                // } else {
+                //     cout << "Mensaje no JSON recibido: " << received;
+                // }
             } else if (bytes_read == 0) {
                 close(sock);
                 break;
@@ -112,7 +116,7 @@ private:
                 json_msg = makeDISCONNECT(type);
                 break;
             default:
-                cout <<"no mandaste un mensaje json";
+                json_msg["message"] = message; //hacemos un  json sin tipo para manejar mensajes sin ningun comando
                 break;
         }
         string msg = JSONToString(json_msg);
@@ -128,42 +132,38 @@ private:
         //id
         if (input.substr(0, 3) == "id ") {
             string user_name = input.substr(3);
-            if (user_name.empty()) {
-                cout << "No ingresaste el comando para identificarte" << endl;
-                exit(0);
-            }
+            
             sendMessage(IDENTIFY, user_name);
-        }
-        //status
-        else if (input.substr(0, 4) == "sts ") {
-            string new_status = input.substr(4);
-            if (new_status == "ACTIVE" || new_status == "AWAY" || new_status == "BUSY") {
+        } else if(!is_identified){
+            cout << "no te identificaste correctamente" << endl;
+            exit(0);
+        } else{
+            //status
+            if (input.substr(0, 4) == "sts ") {
+                string new_status = input.substr(4);
                 sendMessage(STATUS, new_status);
-            } else {
-                cout << "Estado inválido. Usa 'ACTIVE', 'AWAY' o 'BUSY'." << endl;
+                
             }
-        }
-        //users list
-        else if(input.substr(0, 6) == "users"){
-            sendMessage(USERS, "");
-        }
-        //public message
-        else if(input.substr(0, 3) == "pb "){
-            string message = input.substr(3);
-            if (message.empty()) {
-                cout << "No ingresaste el mensaje" << endl;
+            //users list
+            else if(input.substr(0, 6) == "users"){
+                sendMessage(USERS, "");
+            }
+            //disconnect
+            else if (input == "exit") {
+                sendMessage(DISCONNECT, "");
+                close(sock);
+                cout << "Te has desconectado del servidor." << endl;
                 exit(0);
             }
-            sendMessage(PUBLIC_TEXT, message);
-        } else if (input == "exit") {
-            sendMessage(DISCONNECT, "");
-            close(sock);
-            cout << "Te has desconectado del servidor." << endl;
-            exit(0);
+            //public message
+            else if(input.substr(0, 3) == "pb "){
+                string message = input.substr(3);            
+                sendMessage(PUBLIC_TEXT, message);
+            } else{
+                sendMessage(NONE,input); //esto esta muy raro aca se debe manejar cuando no ingresas  ningun comando
+            }
         }
-        else {
-            cout << "Mensaje invalido"<< endl; //eliminar cuando implemente Disconnected
-        }
+        
     }
 
 

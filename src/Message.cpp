@@ -30,6 +30,7 @@ enum MessageType{
     LEFT_ROOM,
     DISCONNECT,
     DISCONNECTED,
+    NONE //no estoy seguro
 };
 
 json makeIDENTIFY(MessageType type, const string& username, const string& result = "") {
