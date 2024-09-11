@@ -91,12 +91,8 @@ private:
                 if (received.front() == '{' && received.back() == '}') {
                     cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = json::parse(received);
-                    // json json_msg = StringToJSON(received);
                     handleMessageType(json_msg);
                 }
-                // } else {
-                //     cout << "Mensaje no JSON recibido: " << received;
-                // }
             } else if (bytes_read == 0) {
                 close(sock);
                 break;
@@ -126,17 +122,19 @@ private:
                 json_msg = makeTEXT(type, message, target_user);
                 break;
             default:
-                //lo mejor tambien podria ser que mandemos el mensaje sin hacerlo json y ya en el server verificar si es un json o no
-                json_msg["message"] = message; //hacemos un  json sin tipo para manejar mensajes sin ningun comando
                 break;
         }
         string msg = json_msg.dump();
-        // string msg = JSONToString(json_msg);
-        send(sock, msg.c_str(), msg.size(), 0);
-        if (type == PUBLIC_TEXT) {
-            cout << status << " " << user_name << ": " << message << endl;
-        }
-        cout << "Mensaje enviado json: " << msg << endl;
+        if(type != NONE) {
+            send(sock, msg.c_str(), msg.size(), 0);
+            if (type == PUBLIC_TEXT) {
+                cout << status << " " << user_name << ": " << message << endl;
+            }
+            cout << "Mensaje enviado json: " << msg << endl;
+        } else{
+            send(sock, message.c_str(), message.size(), 0);
+            cout << "Mensaje no json: " << message << endl;
+        } 
     }
 
     //maybe tener una enum

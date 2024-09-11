@@ -59,8 +59,39 @@ string messageTypeToString(MessageType type) {
         case LEFT_ROOM: return "LEFT_ROOM";
         case DISCONNECT: return "DISCONNECT";
         case DISCONNECTED: return "DISCONNECTED";
+        default: return "hola";
     }
 }
+
+MessageType stringToMessageType(const string& type_str) {
+    if (type_str == "IDENTIFY") return IDENTIFY;
+    else if (type_str == "RESPONSE") return RESPONSE;
+    else if (type_str == "NEW_USER") return NEW_USER;
+    else if (type_str == "STATUS") return STATUS;
+    else if (type_str == "NEW_STATUS") return NEW_STATUS;
+    else if (type_str == "USERS") return USERS;
+    else if (type_str == "USER_LIST") return USER_LIST;
+    else if (type_str == "TEXT") return TEXT;
+    else if (type_str == "TEXT_FROM") return TEXT_FROM;
+    else if (type_str == "PUBLIC_TEXT") return PUBLIC_TEXT;
+    else if (type_str == "PUBLIC_TEXT_FROM") return PUBLIC_TEXT_FROM;
+    else if (type_str == "NEW_ROOM") return NEW_ROOM;
+    else if (type_str == "INVITE") return INVITE;
+    else if (type_str == "INVITATION") return INVITATION;
+    else if (type_str == "JOIN_ROOM") return JOIN_ROOM;
+    else if (type_str == "JOINED_ROOM") return JOINED_ROOM;
+    else if (type_str == "ROOM_USERS") return ROOM_USERS;
+    else if (type_str == "ROOM_USERS_LIST") return ROOM_USERS_LIST;
+    else if (type_str == "ROOM_TEXT") return ROOM_TEXT;
+    else if (type_str == "ROOM_TEXT_FROM") return ROOM_TEXT_FROM;
+    else if (type_str == "LEAVE_ROOM") return LEAVE_ROOM;
+    else if (type_str == "LEFT_ROOM") return LEFT_ROOM;
+    else if (type_str == "DISCONNECT") return DISCONNECT;
+    else if (type_str == "DISCONNECTED") return DISCONNECTED;
+    return NONE;  // Tipo de mensaje desconocido
+}
+
+
 
 json makeRESPONSE(string operation, string result, string extra = ""){
     json response;
