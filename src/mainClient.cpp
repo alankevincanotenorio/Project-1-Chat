@@ -5,7 +5,7 @@ using namespace std;
 
 int main(int args, char*argv[]) {
     if(args != 3) {
-        cerr  << "Please only execute the bin archive and insert the 4 server port digits" << endl;
+        cerr  << "Please only execute the bin archive, insert the server ip and the 4 server port digits" << endl;
         return 0;
     }
     string server_ip = argv[1];

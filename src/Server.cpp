@@ -121,7 +121,7 @@ public:
             //string r = JSONToString(response);
             cout<<"El servidor responde: " << r;
             send(client_socket, r.c_str(), r.size(), 0);
-            generalRoom->addClient(client_socket, r);
+            generalRoom->addNewClient(client_socket, r);
             return true;
         }
     }
