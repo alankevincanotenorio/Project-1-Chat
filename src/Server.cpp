@@ -17,7 +17,8 @@ private:
     int addrlen = sizeof(address);
     unique_ptr<Room> generalRoom;
     unique_ptr<unordered_map<int, int>> clients_sockets;
-    unique_ptr<unordered_map<string, Room>> rooms;
+    unordered_map<string, unique_ptr<Room>> rooms;  // Unordered_map para almacenar punteros inteligentes a Room
+
 
 public:
     string ipAddress;
@@ -52,6 +53,7 @@ public:
             return;
         }
         generalRoom = make_unique<Room>("General");
+        rooms["General"] = std::make_unique<Room>("General");
     }
 
     //connect client method
@@ -158,8 +160,41 @@ public:
                 string response_str = JSONToString(response);
                 send(client_socket, response_str.c_str(), response_str.size(), 0);
             }
+        } else if (message_type == "NEW_ROOM") {
+            string roomname = json_msg["roomname"];
+            handleNewRoom(roomname, username, client_socket);
+            printRooms();
         } //checar los mensajes invalidos
     }
+
+
+void printRooms() {
+    cout << "Lista de cuartos disponibles:" << endl;
+    for (const auto& room_pair : rooms) {
+        cout << "Cuarto: " << room_pair.first << endl;
+    }
+}
+
+
+
+    void handleNewRoom(const string& roomname, const string& username, int client_socket) {
+    // Verificar si el cuarto ya existe
+    if (rooms.find(roomname) != rooms.end()) {
+        json response = makeIDENTIFY(RESPONSE, roomname, "ROOM_ALREADY_EXISTS");
+        string response_str = JSONToString(response);
+        send(client_socket, response_str.c_str(), response_str.size(), 0);
+    } else {
+        // Crear el cuarto usando std::make_unique y agregar al usuario
+        auto newRoom = std::make_unique<Room>(roomname);  // Crear el nuevo cuarto
+        newRoom->addClientRoom(username, client_socket);  // Agregar el cliente al cuarto
+        rooms[roomname] = std::move(newRoom);  // Mover el unique_ptr al unordered_map
+
+        // Responder con SUCCESS
+        json response = makeIDENTIFY(RESPONSE, roomname, "SUCCESS");
+        string response_str = JSONToString(response);
+        send(client_socket, response_str.c_str(), response_str.size(), 0);
+    }
+}
 
 
 

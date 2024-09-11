@@ -100,6 +100,9 @@ public:
         }
         return -1;
     }
-
+    
+    void addClientRoom(const string& username, int socket_fd) {
+        (*clients)[username] = {"ACTIVE", socket_fd};
+    }
 
 };

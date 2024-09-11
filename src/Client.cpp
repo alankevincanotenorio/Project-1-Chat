@@ -25,6 +25,14 @@ private:
         string message_type = json_msg["type"];
         if (message_type == "RESPONSE") {
             string result = json_msg["result"];
+            string operation = json_msg["operation"];
+            if (operation == "NEW_ROOM") {
+            if (result == "SUCCESS") {
+                cout << "El cuarto '" << json_msg["extra"] << "' fue creado exitosamente." << endl;
+            } else if (result == "ROOM_ALREADY_EXISTS") {
+                cout << "El cuarto '" << json_msg["extra"] << "' ya existe." << endl;
+            }
+        }
             if (result == "SUCCESS") {
                 is_identified = true;
                 user_name = json_msg["extra"];
@@ -124,6 +132,10 @@ private:
             case TEXT:
                 json_msg = makeTEXT(type, message, target_user);
                 break;
+            case NEW_ROOM: 
+                json_msg["type"] = "NEW_ROOM";
+                json_msg["roomname"] = message;
+                break;
             default:
                 //lo mejor tambien podria ser que mandemos el mensaje sin hacerlo json y ya en el server verificar si es un json o no
                 json_msg["message"] = message; //hacemos un  json sin tipo para manejar mensajes sin ningun comando
@@ -180,7 +192,12 @@ private:
                 } else {
                     cout << "Formato incorrecto de mensaje, usa: txt <username> <mensaje>" << endl;
                 }
+            } 
+            else if (input.substr(0, 4) == "new ") {
+                string roomname = input.substr(4);
+                sendMessage(NEW_ROOM, roomname);  // Envía el comando NEW_ROOM
             }
+
             else{
                 sendMessage(NONE,input); //esto esta muy raro aca se debe manejar cuando no ingresas  ningun comando
             }
