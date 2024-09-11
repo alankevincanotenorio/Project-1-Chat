@@ -90,7 +90,8 @@ private:
                 string received(buffer);
                 if (received.front() == '{' && received.back() == '}') {
                     cout << "Mensaje recibido JSON: " << received << endl;
-                    json json_msg = StringToJSON(received);
+                    json json_msg = json::parse(received);
+                    // json json_msg = StringToJSON(received);
                     handleMessageType(json_msg);
                 }
                 // } else {
@@ -116,7 +117,7 @@ private:
                 json_msg = makeUSERS(type);
                 break;
             case PUBLIC_TEXT:
-                json_msg = makePbtext(type, message);
+                json_msg = makePublictxt(type, message);
                 break;
             case DISCONNECT:
                 json_msg = makeDISCONNECT(type);
@@ -129,7 +130,8 @@ private:
                 json_msg["message"] = message; //hacemos un  json sin tipo para manejar mensajes sin ningun comando
                 break;
         }
-        string msg = JSONToString(json_msg);
+        string msg = json_msg.dump();
+        // string msg = JSONToString(json_msg);
         send(sock, msg.c_str(), msg.size(), 0);
         if (type == PUBLIC_TEXT) {
             cout << status << " " << user_name << ": " << message << endl;

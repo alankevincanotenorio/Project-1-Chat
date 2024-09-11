@@ -23,11 +23,13 @@ public:
     Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, ClientData>>()) {}
 
     void addClient(int client_socket, const string& success) {
-        json response = StringToJSON(success);
+        json response = json::parse(success);
+        //json response = StringToJSON(success);
         string username = response["extra"];
         (*clients)[username] = {"ACTIVE", client_socket};
         json nu = makeIDENTIFY(NEW_USER, username);
-        string m = JSONToString(nu);
+        string m = nu.dump();
+        //string m = JSONToString(nu);
         sendMsgToRoom(m, client_socket);
     }
 
@@ -37,7 +39,8 @@ public:
     if (it != clients->end() && it->second.socket_fd == client_socket) {
         clients->erase(it);
         json disconnected_msg = makeDISCONNECT(DISCONNECTED, "", username);
-        string disconnected_str = JSONToString(disconnected_msg);
+        string disconnected_str = disconnected_msg.dump();
+        // string disconnected_str = JSONToString(disconnected_msg);
         sendMsgToRoom(disconnected_str, client_socket);
         close(client_socket);
     }
@@ -59,7 +62,8 @@ public:
         if (it != clients->end()) {
             it->second.status = new_status;
             json status_msg = makeSTATUS(NEW_STATUS, new_status, username);
-            string msg = JSONToString(status_msg);
+            string msg = status_msg.dump();
+            // string msg = JSONToString(status_msg);
             sendMsgToRoom(msg, it->second.socket_fd);
         }
     }
@@ -83,7 +87,8 @@ public:
             users[username] = client_info.status;
         }
         json user_list_msg = makeUSERS(USER_LIST, users);
-        string user_list_str = JSONToString(user_list_msg);
+        string user_list_str = user_list_msg.dump();
+        // string user_list_str = JSONToString(user_list_msg);
         send(client_socket, user_list_str.c_str(), user_list_str.size(), 0);
     }
 

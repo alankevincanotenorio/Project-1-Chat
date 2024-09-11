@@ -30,166 +30,163 @@ enum MessageType{
     LEFT_ROOM,
     DISCONNECT,
     DISCONNECTED,
-    NONE //no estoy seguro
+    NONE
 };
+
+string messageTypeToString(MessageType type) {
+    switch (type) {
+        case IDENTIFY: return "IDENTIFY";
+        case RESPONSE: return "RESPONSE";
+        case NEW_USER: return "NEW_USER";
+        case STATUS: return "STATUS";
+        case NEW_STATUS: return "NEW_STATUS";
+        case USERS: return "USERS";
+        case USER_LIST: return "USER_LIST";
+        case TEXT: return "TEXT";
+        case TEXT_FROM: return "TEXT_FROM";
+        case PUBLIC_TEXT: return "PUBLIC_TEXT";
+        case PUBLIC_TEXT_FROM: return "PUBLIC_TEXT_FROM";
+        case NEW_ROOM: return "NEW_ROOM";
+        case INVITE: return "INVITE";
+        case INVITATION: return "INVITATION";
+        case JOIN_ROOM: return "JOIN_ROOM";
+        case JOINED_ROOM: return "JOINED_ROOM";
+        case ROOM_USERS: return "ROOM_USERS";
+        case ROOM_USERS_LIST: return "ROOM_USERS_LIST";
+        case ROOM_TEXT: return "ROOM_TEXT";
+        case ROOM_TEXT_FROM: return "ROOM_TEXT_FROM";
+        case LEAVE_ROOM: return "LEAVE_ROOM";
+        case LEFT_ROOM: return "LEFT_ROOM";
+        case DISCONNECT: return "DISCONNECT";
+        case DISCONNECTED: return "DISCONNECTED";
+    }
+}
+
+json makeRESPONSE(string operation, string result, string extra = ""){
+    json response;
+    response["type"] = messageTypeToString(RESPONSE);
+    response["operation"] = operation;
+    response["result"] = result;
+    if(operation == "INVALID") return response;
+    response["extra"] = extra;
+    return response;
+}
 
 json makeIDENTIFY(MessageType type, const string& username, const string& result = "") {
     json id_json;
     switch(type) {
         case IDENTIFY:
-            id_json["type"] = "IDENTIFY";
+            id_json["type"] = messageTypeToString(IDENTIFY);
             id_json["username"] = username;
             break;
         case NEW_USER:
-            id_json["type"] = "NEW_USER";
+            id_json["type"] = messageTypeToString(NEW_USER);
             id_json["username"] = username;
             break;
-        case RESPONSE: //maybe make method makeRESPONSE
-            id_json["type"] = "RESPONSE";
-            id_json["operation"] = "IDENTIFY";
-            id_json["result"] = result;
-            id_json["extra"] = username;
+        case RESPONSE:
+            id_json = makeRESPONSE(messageTypeToString(IDENTIFY), result, username);
             break;
         default:
             break;
     }
-    return id_json;
-}
-
-json makeINVALID(MessageType type, const string& result) {
-    json id_json;
-    id_json["type"] = "RESPONSE";
-    id_json["operation"] = "INVALID";
-    id_json["result"] = result;
     return id_json;
 }
 
 json makeSTATUS(MessageType type, const string& result, const string& username = "") {
-    json id_json;
+    json status;
     switch(type) {
         case STATUS:
-            id_json["type"] = "STATUS";
-            id_json["status"] = result;
+            status["type"] = messageTypeToString(STATUS);
+            status["status"] = result;
             break;
         case NEW_STATUS:
-            id_json["type"] = "NEW_STATUS";
-            id_json["username"] = username;
-            id_json["status"] = result;
+            status["type"] = messageTypeToString(NEW_STATUS);
+            status["username"] = username;
+            status["status"] = result;
             break;
         default:
-            cout << "Error: Tipo de mensaje de estado no soportado" << endl;
+            break;
     }
-    return id_json;
+    return status;
 }
 
-json makeUSERS(MessageType type, const unordered_map<string, string>& users = {}) {
-    json id_json;
+json makeUSERS(MessageType type, const unordered_map<string, string>& users_map = {}) {
+    json users_list;
     json users_json;
     switch(type) {
         case USERS:
-            id_json["type"] = "USERS";
+            users_list["type"] = messageTypeToString(USERS);
             break;
         case USER_LIST:
-            id_json["type"] = "USER_LIST";
-            for (const auto& [username, status] : users) {
+            users_list["type"] = messageTypeToString(USER_LIST);
+            for (const auto& [username, status] : users_map) {
                 users_json[username] = status;
             }
-            id_json["users"] = users_json;
+            users_list["users"] = users_json;
             break;
         default:
-            cout << "Error: Tipo de mensaje no soportado" << endl;
             break;
     }
-    return id_json;
+    return users_list;
 }
 
-json makePbtext(MessageType type, string message, string username = ""){
-    json id_json;
+json makePublictxt(MessageType type, string message, string username = ""){
+    json public_txt;
     switch(type){
         case PUBLIC_TEXT:
-            id_json["type"] = "PUBLIC_TEXT";
-            id_json["text"] = message;
+            public_txt["type"] = messageTypeToString(PUBLIC_TEXT);
+            public_txt["text"] = message;
             break;
         case PUBLIC_TEXT_FROM:
-            id_json["type"] = "PUBLIC_TEXT_FROM";
-            id_json["username"] = username;
-            id_json["text"] = message;
+            public_txt["type"] = messageTypeToString(PUBLIC_TEXT_FROM);
+            public_txt["username"] = username;
+            public_txt["text"] = message;
             break;
         default:
-            cout << "Error: Tipo de mensaje no soportado" << endl;
             break;
     }
-    return id_json;
+    return public_txt;
 }
 
-
 json makeDISCONNECT(MessageType type, string roomname = "", string username = "") {
-    json id_json;
+    json disconnect;
     switch(type) {
         case DISCONNECT:
-            id_json["type"] = "DISCONNECT";
+            disconnect["type"] = messageTypeToString(DISCONNECT);
             break;
         case DISCONNECTED:
-            id_json["type"] = "DISCONNECTED";
-            id_json["username"] = username;
+            disconnect["type"] = messageTypeToString(DISCONNECTED);
+            disconnect["username"] = username;
             break;
         case LEFT_ROOM:
-            id_json["type"] = "LEFT_ROOM";
-            id_json["roomname"] = roomname;
-            id_json["username"] = username;
+            disconnect["type"] = messageTypeToString(LEFT_ROOM);
+            disconnect["roomname"] = roomname;
+            disconnect["username"] = username;
             break;
         default:
-            cout << "Error: Tipo de mensaje de estado no soportado" << endl;
+            break;
     }
-    return id_json;
+    return disconnect;
 }
 
 json makeTEXT(MessageType type, string message, string username = ""){
-    json id_json;
+    json text;
     switch(type){
         case TEXT:
-            id_json["type"] = "TEXT";
-            id_json["username"] = username;
-            id_json["text"] = message;
+            text["type"] = messageTypeToString(TEXT);
+            text["username"] = username;
+            text["text"] = message;
             break;
         case TEXT_FROM:
-            id_json["type"] = "TEXT_FROM";
-            id_json["username"] = username;
-            id_json["text"] = message;
+            text["type"] = messageTypeToString(TEXT_FROM);
+            text["username"] = username;
+            text["text"] = message;
             break;
-        case RESPONSE: //maybe make method makeRESPONSE
-            id_json["type"] = "RESPONSE";
-            id_json["operation"] = "IDENTIFY";
-            id_json["result"] = "NO_SUCH_USER";
-            id_json["extra"] = username;
+        case RESPONSE:
+            text = makeRESPONSE(messageTypeToString(TEXT), "NO_SUCH_USER", username);
             break;
         default:
-            cout << "Error: Tipo de mensaje no soportado" << endl;
             break;
     }
-    return id_json;
+    return text;
 }
-
-//serializar
-string JSONToString(const json& j){
-    string jsonMessage = j.dump();
-    return jsonMessage;
-}
-
-//parsear
-json StringToJSON(const string& jsonMessage){
-    json json = json::parse(jsonMessage);
-    return json;
-}
-
-
-//get data from a json
-    string getData(char buffer[], string type){
-        string msg(buffer);
-        json json_msg = StringToJSON(msg);
-        string data;
-        if(type == "username") data = json_msg["username"];
-        if(type == "text") data = json_msg["text"];
-        if(type == "result") data = json_msg["result"];
-        return data;   
-    }

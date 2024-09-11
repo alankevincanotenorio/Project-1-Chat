@@ -15,7 +15,7 @@ private:
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    unique_ptr<Room> generalRoom;
+    unique_ptr<Room> generalRoom;// cambiarlo al initSocket
     unique_ptr<unordered_map<int, int>> clients_sockets;
     unique_ptr<unordered_map<string, Room>> rooms;
 
@@ -24,8 +24,6 @@ public:
     int port;
     Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {}
 
-    //maybe erase if
-    
     void initSocket() {
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd == -1) {
@@ -71,7 +69,10 @@ public:
     void handleClient(int client_socket) {
         char buffer[512] = {0};
         if (userRegister(buffer, client_socket)) {
-            string username = getData(buffer, "username");
+            string msg(buffer);
+            json msgJ = json::parse(msg);
+            string username = msgJ["username"];
+            // string username = getData(buffer, "username");
             while (true) {
                 int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
                 if (bytes_read <= 0) break;
@@ -79,8 +80,12 @@ public:
                 sendMsg(buffer, username, client_socket);
             }
         } else {
-            json response = makeIDENTIFY(RESPONSE, getData(buffer, "username"), "USER_ALREADY_EXISTS");
-            string usr_exist = JSONToString(response);
+            string msg(buffer);
+            json msgJ = json::parse(msg);
+            string username = msgJ["username"];
+            json response = makeIDENTIFY(RESPONSE, username, "USER_ALREADY_EXISTS");
+            string usr_exist = response.dump();
+            //string usr_exist = JSONToString(response);
             send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
             close(client_socket);
         }
@@ -92,13 +97,18 @@ public:
     bool userRegister(char username[], int client_socket){
         int bytes_read = read(client_socket, username, 512);
         username[bytes_read] = '\0';
-        string u = getData(username, "username");
-
-        json json_msg = StringToJSON(username);
+        string j(username);
+        json jssj = json::parse(j);
+        string u = jssj["username"];
+        //string u = getData(username, "username");
+        json json_msg = json::parse(username);
+        //json json_msg = StringToJSON(username);
         
         if(u.size() > 8 || json_msg["type"] != "IDENTIFY" || u.size() == 0) {
-            json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
-            string s = JSONToString(r);
+            json r = makeRESPONSE("INVALID","NOT_IDENTIFIED");
+            // json r = makeINVALID(RESPONSE, "NOT_IDENTIFIED");
+            string s = r.dump();
+            //string s = JSONToString(r);
             send(client_socket, s.c_str(), s.size(), 0);
             close(client_socket); 
             return false;
@@ -107,7 +117,8 @@ public:
         if (n != "NO_SUCH_USER") return false;
         else{
             json response = makeIDENTIFY(RESPONSE, u, "SUCCESS");
-            string r = JSONToString(response);
+            string r = response.dump();
+            //string r = JSONToString(response);
             cout<<"El servidor responde: " << r;
             send(client_socket, r.c_str(), r.size(), 0);
             generalRoom->addClient(client_socket, r);
@@ -118,7 +129,8 @@ public:
     //falta el try-catch para la excepcion
     void sendMsg(char buffer[], const string& username, int client_socket) {
         string msg(buffer);
-        json json_msg = StringToJSON(msg);
+        json json_msg = json::parse(msg);
+        //json json_msg = StringToJSON(msg);
         string message_type = json_msg["type"];
         if (message_type == "PUBLIC_TEXT") {
             string message = json_msg["text"];
@@ -127,14 +139,17 @@ public:
                 close(client_socket);
                 return;
             }
-            json response = makePbtext(PUBLIC_TEXT_FROM, message, username);
-            string r = JSONToString(response);
+            json response = makePublictxt(PUBLIC_TEXT_FROM, message, username);
+            string r = response.dump();
+            //string r = JSONToString(response);
             generalRoom->sendMsgToRoom(r, client_socket);
         } else if (message_type == "STATUS") {
             string new_status = json_msg["status"];
             if ((new_status != "ACTIVE" && new_status != "AWAY" && new_status != "BUSY") || (new_status.size() == 0)) {
-                json invalid_response = makeINVALID(RESPONSE, "INVALID");
-                string response_str = JSONToString(invalid_response);
+                json invalid_response = makeRESPONSE("INVALID", "INVALID");
+                // json invalid_response = makeINVALID(RESPONSE, "INVALID");
+                string response_str = invalid_response.dump();
+                // string response_str = JSONToString(invalid_response);
                 send(client_socket, response_str.c_str(), response_str.size(), 0);
                 generalRoom->removeClient(client_socket, username);
                 close(client_socket);
@@ -150,12 +165,14 @@ public:
             string message = json_msg["text"];
             if (generalRoom->isUserInRoom(target_user)) {
                 json response = makeTEXT(TEXT_FROM, message, username);
-                string response_str = JSONToString(response);
+                string response_str = response.dump();
+                //string response_str = JSONToString(response);
                 int target_socket = generalRoom->getUserSocket(target_user);
                 send(target_socket, response_str.c_str(), response_str.size(), 0);
             } else {
                 json response = makeTEXT(RESPONSE, target_user);
-                string response_str = JSONToString(response);
+                string response_str = response.dump();
+                //string response_str = JSONToString(response);
                 send(client_socket, response_str.c_str(), response_str.size(), 0);
             }
         } //checar los mensajes invalidos
