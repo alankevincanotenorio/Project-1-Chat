@@ -144,6 +144,32 @@ json makeDISCONNECT(MessageType type, string roomname = "", string username = ""
     return id_json;
 }
 
+json makeTEXT(MessageType type, string message, string username = ""){
+    json id_json;
+    switch(type){
+        case TEXT:
+            id_json["type"] = "TEXT";
+            id_json["username"] = username;
+            id_json["text"] = message;
+            break;
+        case TEXT_FROM:
+            id_json["type"] = "TEXT_FROM";
+            id_json["username"] = username;
+            id_json["text"] = message;
+            break;
+        case RESPONSE: //maybe make method makeRESPONSE
+            id_json["type"] = "RESPONSE";
+            id_json["operation"] = "IDENTIFY";
+            id_json["result"] = "NO_SUCH_USER";
+            id_json["extra"] = username;
+            break;
+        default:
+            cout << "Error: Tipo de mensaje no soportado" << endl;
+            break;
+    }
+    return id_json;
+}
+
 //serializar
 string JSONToString(const json& j){
     string jsonMessage = j.dump();

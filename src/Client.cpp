@@ -42,6 +42,8 @@ private:
                 cout << "Mensaje invalido" << endl;
                 close(sock);
                 exit(0);
+            } else if (result == "NO_SUCH_USER") {
+                cout << "El usuario " << json_msg["extra"] << " no existe." << endl;
             }
         } else if (message_type == "NEW_USER") {
             string user_name = json_msg["username"];
@@ -63,6 +65,10 @@ private:
             for (auto& [username, status] : users_json.items()) {
                 cout << username << ": " << status << endl;
             }
+        } else if (message_type == "TEXT_FROM") {
+            string text = json_msg["text"];
+            string from_user = json_msg["username"];
+            cout << from_user << " (mensaje privado): " << text << endl;
         } else if(message_type == "PUBLIC_TEXT_FROM"){
             string text = json_msg["text"];
             string n = json_msg["username"];
@@ -97,7 +103,7 @@ private:
         }
     }
 
-    void sendMessage(MessageType type, const string& message) {
+    void sendMessage(MessageType type, const string& message, const string& target_user = "") {
         json json_msg;
         switch (type) {
             case IDENTIFY:
@@ -115,7 +121,11 @@ private:
             case DISCONNECT:
                 json_msg = makeDISCONNECT(type);
                 break;
+            case TEXT:
+                json_msg = makeTEXT(type, message, target_user);
+                break;
             default:
+                //lo mejor tambien podria ser que mandemos el mensaje sin hacerlo json y ya en el server verificar si es un json o no
                 json_msg["message"] = message; //hacemos un  json sin tipo para manejar mensajes sin ningun comando
                 break;
         }
@@ -128,7 +138,7 @@ private:
     }
 
     //maybe tener una enum
-    void checkCommand(const string& input) {
+    void checkCommand(const string& input, string username = "") {
         //id
         if (input.substr(0, 3) == "id ") {
             string user_name = input.substr(3);
@@ -159,7 +169,19 @@ private:
             else if(input.substr(0, 3) == "pb "){
                 string message = input.substr(3);            
                 sendMessage(PUBLIC_TEXT, message);
-            } else{
+            } 
+            // private text
+            else if (input.substr(0, 4) == "txt ") {
+                size_t spacePos = input.find(" ", 4);
+                if (spacePos != string::npos) {
+                    string target_user = input.substr(4, spacePos - 4);
+                    string private_message = input.substr(spacePos + 1);
+                    sendMessage(TEXT, private_message, target_user);
+                } else {
+                    cout << "Formato incorrecto de mensaje, usa: txt <username> <mensaje>" << endl;
+                }
+            }
+            else{
                 sendMessage(NONE,input); //esto esta muy raro aca se debe manejar cuando no ingresas  ningun comando
             }
         }

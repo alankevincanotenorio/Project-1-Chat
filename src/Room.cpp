@@ -93,4 +93,13 @@ public:
     }
 
 
+    int getUserSocket(const string& username) {
+        auto it = clients->find(username);
+        if (it != clients->end()) {
+            return it->second.socket_fd;
+        }
+        return -1;
+    }
+
+
 };

@@ -145,6 +145,19 @@ public:
             generalRoom->sendUserList(client_socket);
         } else if (message_type == "DISCONNECT") {
             generalRoom->removeClient(client_socket, username);
+        } else if(message_type == "TEXT"){
+            string target_user = json_msg["username"];
+            string message = json_msg["text"];
+            if (generalRoom->isUserInRoom(target_user)) {
+                json response = makeTEXT(TEXT_FROM, message, username);
+                string response_str = JSONToString(response);
+                int target_socket = generalRoom->getUserSocket(target_user);
+                send(target_socket, response_str.c_str(), response_str.size(), 0);
+            } else {
+                json response = makeTEXT(RESPONSE, target_user);
+                string response_str = JSONToString(response);
+                send(client_socket, response_str.c_str(), response_str.size(), 0);
+            }
         } //checar los mensajes invalidos
     }
 
