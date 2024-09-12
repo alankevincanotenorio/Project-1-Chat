@@ -67,80 +67,67 @@ public:
     
     void handleClient(int client_socket) {
         char buffer[512] = {0};
-        bool isIdentified = false;  // Indica si el usuario ya está identificado
+        bool isIdentified = false;
         int bytes_read = read(client_socket, buffer, 512);
         buffer[bytes_read] = '\0';
         try{
-            json json_msg = json::parse(buffer);
-            if (json_msg["type"] == "IDENTIFY") {
-                isIdentified = userRegister(json_msg, client_socket);  // Llamar a userRegister con el JSON ya parseado
+            json msg = json::parse(buffer);
+            string username = msg["username"];
+            if (msg["type"] == "IDENTIFY") {
+                isIdentified = userRegister(msg, client_socket);
                 if (!isIdentified) {
-                    string username = getData(buffer, "username");
                     json response = makeIDENTIFY(RESPONSE, username, "USER_ALREADY_EXISTS");
-                    string usr_exist = response.dump();
-                    send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
-                    close(client_socket);
-                }
-            }
-                if(!isIdentified){
-                    json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
                     sendResponseAndClose(client_socket, response.dump());
                 }
-                string username = getData(buffer, "username");
-                while (true) {
-                    int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
-                    if (bytes_read <= 0) break;
-                    buffer[bytes_read] = '\0';
-                    sendMsg(buffer, username, client_socket);
-                }
-            
+            }
+            if(!isIdentified){
+                json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
+                sendResponseAndClose(client_socket, response.dump());
+            }
+            while (true) {
+                int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+                if (bytes_read <= 0) break;
+                buffer[bytes_read] = '\0';
+                sendMsg(buffer, username, client_socket);
+            }
         } catch (const json::parse_error& e) {
             json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
             sendResponseAndClose(client_socket, response.dump());
         }        
     }
 
-
-
-bool userRegister(const json& json_msg, int client_socket) {
-        // Obtener el nombre de usuario del JSON ya parseado
-        string u = json_msg.at("username");
-        // Verificar condiciones de registro
-        if (u.size() > 8 || json_msg.at("type") != "IDENTIFY" || u.empty()) {
-            json r = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
-            sendResponseAndClose(client_socket, r.dump());
+    bool userRegister(const json& json_msg, int client_socket) {
+        string username = json_msg["username"];
+        if (username.size() > 8 || json_msg.at("type") != "IDENTIFY" || username.empty()) {
+            json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
+            sendResponseAndClose(client_socket, response.dump());
             return false;
         }
-        // Verificar si el usuario ya está registrado
-        string n = generalRoom->getUserRegister(u);
-        if (n != "NO_SUCH_USER") return false;
-        // Responder con éxito
-        json response = makeIDENTIFY(RESPONSE, u, "SUCCESS");
+        string user = generalRoom->getUserRegister(user);
+        if (user != "NO_SUCH_USER") return false;
+        json response = makeIDENTIFY(RESPONSE, username, "SUCCESS");
         send(client_socket, response.dump().c_str(), response.dump().size(), 0);
         generalRoom->addNewClient(client_socket, response.dump());
         return true;
-}
-
+    }
 
     //falta manejar el caso en public text que te manden un mensaje vacio
+    //puede que lo vuelva a refactorizar para que sea menos largo y cumpla el P.R.U
     void sendMsg(char buffer[], const string& username, int client_socket) {
         json json_msg;
         try{
             json_msg = json::parse(buffer);
         } catch (json::parse_error& e){
-            json n = makeRESPONSE("INVALID", "INVALID");
-            string ns = n.dump();
-            send(client_socket, ns.c_str(), ns.size(), 0);
-            close(client_socket);
+            json response = makeRESPONSE("INVALID", "INVALID");
+            sendResponseAndClose(client_socket, response.dump());
             generalRoom->removeClient(client_socket, username);
-            return;
         }
-        string m = getData(buffer, "type");
-        MessageType message_type = stringToMessageType(m);
-        switch (message_type) {
+        string message_type = json_msg["type"];
+        MessageType type = stringToMessageType(message_type);
+        switch (type) {
             case PUBLIC_TEXT: {
                 string message = json_msg["text"];
-                if (message == "exit" || message.size() == 0) {
+                if (message == "exit" || message == "") { //el caso en que no te envien un mensaje si te desconecta pero no te avisa ni cierra terminal
                     generalRoom->removeClient(client_socket, username);
                     close(client_socket);
                     return;
@@ -188,23 +175,19 @@ bool userRegister(const json& json_msg, int client_socket) {
         }
     }
 
-
     // Función para enviar una respuesta y cerrar la conexión
-void sendResponseAndClose(int client_socket, const string& response) {
-    send(client_socket, response.c_str(), response.size(), 0);
-    close(client_socket);
-}
-
-// Función para enviar un mensaje a un usuario específico
-void sendResponseToUser(const string& target_user, const string& message) {
-    int target_socket = generalRoom->getUserSocket(target_user);
-    if (target_socket != -1) {
-        send(target_socket, message.c_str(), message.size(), 0);
+    void sendResponseAndClose(int client_socket, const string& response) {
+        send(client_socket, response.c_str(), response.size(), 0);
+        close(client_socket);
     }
-}
 
-
-
+    // Función para enviar un mensaje a un usuario específico
+    void sendResponseToUser(const string& target_user, const string& message) {
+        int target_socket = generalRoom->getUserSocket(target_user);
+        if (target_socket != -1) {
+            send(target_socket, message.c_str(), message.size(), 0);
+        }
+    }
 
     //modify
     ~Server() {
@@ -214,13 +197,6 @@ void sendResponseToUser(const string& target_user, const string& message) {
                 cerr << "Error closing socket: " << strerror(errno) << endl;
             }
         }
-    }
-
-string getData(char buffer[], string data){
-        string msg(buffer);
-        json msgJ = json::parse(msg);
-        string username = msgJ[data];
-        return username;
     }
 
 };

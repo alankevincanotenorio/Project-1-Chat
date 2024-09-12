@@ -29,7 +29,7 @@ public:
         sendMsgToRoom(msg_str, client_socket);
     }
 
-    void removeClient(int client_socket, const string& username) {
+    void removeClient(int client_socket, const string& username) { //el username esta vacio wtf
         // Crear y enviar el mensaje LEFT_ROOM si el usuario está en un cuarto falta implementarlo
         auto it = clients->find(username);
         if (it != clients->end() && it->second.socket_fd == client_socket) {
