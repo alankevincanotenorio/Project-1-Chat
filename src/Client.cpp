@@ -20,64 +20,82 @@ private:
 
     bool is_identified = false;
 
-    //chage to switch case
+    // Función para manejar los mensajes según su tipo
     void handleMessageType(const json& json_msg) {
-        string message_type = json_msg["type"];
-        if (message_type == "RESPONSE") {
-            string result = json_msg["result"];
-            if (result == "SUCCESS") {
-                is_identified = true;
-                user_name = json_msg["extra"];
-                setStatus("ACTIVE");
-                cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
-            } else if (result == "USER_ALREADY_EXISTS") {
-                cout << "El nombre de usuario ya está en uso." << endl;
-                close(sock);
-                exit(0);
-            } else if (result == "NOT_IDENTIFIED") {
-                cout << "Sigue las reglas porfa" << endl;
-                close(sock);
-                exit(0);
-            }  else if (result == "INVALID") {
-                cout << "Mensaje invalido" << endl;
-                close(sock);
-                exit(0);
-            } else if (result == "NO_SUCH_USER") {
-                cout << "El usuario " << json_msg["extra"] << " no existe." << endl;
+        string message_type_str = json_msg["type"];
+        MessageType message_type = stringToMessageType(message_type_str);
+        switch (message_type) {
+            case RESPONSE: {
+                string result = json_msg["result"];
+                if (result == "SUCCESS") {
+                    is_identified = true;
+                    user_name = json_msg["extra"];
+                    setStatus("ACTIVE");
+                    cout << "Te has registrado correctamente, ahora puedes enviar mensajes." << endl;
+                } else if (result == "USER_ALREADY_EXISTS") {
+                    cout << "El nombre de usuario ya está en uso." << endl;
+                    close(sock);
+                    exit(0);
+                } else if (result == "NOT_IDENTIFIED") {
+                    cout << "Sigue las reglas por favor." << endl;
+                    close(sock);
+                    exit(0);
+                } else if (result == "INVALID") {
+                    cout << "Mensaje inválido." << endl;
+                    close(sock);
+                    exit(0);
+                } else if (result == "NO_SUCH_USER") {
+                    cout << "El usuario " << json_msg["extra"] << " no existe." << endl;
+                }
+                break;
             }
-        } else if (message_type == "NEW_USER") {
-            string user_name = json_msg["username"];
-            cout << "Nuevo usuario conectado: " << status << user_name << endl; 
-
-        } else if (message_type == "NEW_STATUS") {
-            string s = json_msg["status"];
-            string user_name = json_msg["username"];
-            updateUserStatusMap(user_name, s);
-            if (user_name != this->user_name) {
-                cout << "Nuevo estado actualizado: " << user_status_map[user_name] << user_name << endl;
-            } else {
-                setStatus(s);
-                cout << "Tu estado ha sido actualizado a: " << status << endl;
+            case NEW_USER: {
+                string user_name = json_msg["username"];
+                cout << "Nuevo usuario conectado: " << user_name << endl;
+                break;
             }
-        }  else if (message_type == "USER_LIST") {
-            json users_json = json_msg["users"];
-            cout << "Lista de usuarios en la sala:" << endl;
-            for (auto& [username, status] : users_json.items()) {
-                cout << username << ": " << status << endl;
+            case NEW_STATUS: {
+                string new_status = json_msg["status"];
+                string user_name = json_msg["username"];
+                updateUserStatusMap(user_name, new_status);
+                if (user_name != this->user_name) {
+                    cout << "Nuevo estado actualizado: " << user_status_map[user_name] << " para " << user_name << endl;
+                } else {
+                    setStatus(new_status);
+                    cout << "Tu estado ha sido actualizado a: " << status << endl;
+                }
+                break;
             }
-        } else if (message_type == "TEXT_FROM") {
-            string text = json_msg["text"];
-            string from_user = json_msg["username"];
-            cout << from_user << " (mensaje privado): " << text << endl;
-        } else if(message_type == "PUBLIC_TEXT_FROM"){
-            string text = json_msg["text"];
-            string n = json_msg["username"];
-            string st = user_status_map[n];
-            if(st.empty()) st = "\U0001F600";
-            cout << st << n << ": " << text << endl;
-        }  else if(message_type == "DISCONNECTED"){
-            string n = json_msg["username"];
-            cout << n << " has been disconnected" << endl;
+            case USER_LIST: {
+                json users_json = json_msg["users"];
+                cout << "Lista de usuarios en la sala:" << endl;
+                for (auto& [username, status] : users_json.items()) {
+                    cout << username << ": " << status << endl;
+                }
+                break;
+            }
+            case TEXT_FROM: {
+                string text = json_msg["text"];
+                string from_user = json_msg["username"];
+                cout << from_user << " (mensaje privado): " << text << endl;
+                break;
+            }
+            case PUBLIC_TEXT_FROM: {
+                string text = json_msg["text"];
+                string n = json_msg["username"];
+                string st = user_status_map[n];
+                if (st.empty()) st = "\U0001F600";  // Emoji de sonrisa si no hay estado
+                cout << st << n << ": " << text << endl;
+                break;
+            }
+            case DISCONNECTED: {
+                string n = json_msg["username"];
+                cout << n << " ha sido desconectado." << endl;
+                break;
+            }
+            default:
+                cout << "Tipo de mensaje no reconocido: " << message_type_str << endl;
+                break;
         }
     }
 
@@ -182,10 +200,9 @@ private:
                 }
             }
             else{
-                sendMessage(NONE,input); //esto esta muy raro aca se debe manejar cuando no ingresas  ningun comando
+                sendMessage(NONE,input);
             }
         }
-        
     }
 
 

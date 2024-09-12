@@ -113,14 +113,17 @@ public:
 
     //falta manejar el caso en public text que te manden un mensaje vacio
     //puede que lo vuelva a refactorizar para que sea menos largo y cumpla el P.R.U
-    void sendMsg(char buffer[], const string& username, int client_socket) {
+    void sendMsg(char buffer[], const string& username, int client_socket) {    
         json json_msg;
         try{
             json_msg = json::parse(buffer);
         } catch (json::parse_error& e){
             json response = makeRESPONSE("INVALID", "INVALID");
-            sendResponseAndClose(client_socket, response.dump());
+            string r_str = response.dump();
+            send(client_socket, r_str.c_str(), r_str.size(), 0);
+            close(client_socket);
             generalRoom->removeClient(client_socket, username);
+            return;
         }
         string message_type = json_msg["type"];
         MessageType type = stringToMessageType(message_type);
