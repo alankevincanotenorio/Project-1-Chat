@@ -162,9 +162,6 @@ private:
             string user_name = input.substr(3);
             
             sendMessage(IDENTIFY, user_name);
-        } else if(!is_identified){
-            cout << "no te identificaste correctamente" << endl;
-            exit(0);
         } else{
             //status
             if (input.substr(0, 4) == "sts ") {

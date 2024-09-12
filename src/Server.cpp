@@ -65,39 +65,47 @@ public:
         }
     }
     
-        void handleClient(int client_socket) {
+    void handleClient(int client_socket) {
         char buffer[512] = {0};
         bool isIdentified = false;  // Indica si el usuario ya está identificado
         int bytes_read = read(client_socket, buffer, 512);
         buffer[bytes_read] = '\0';
+        json json_msg;
         try{
-            json json_msg = json::parse(buffer);
-            if (json_msg["type"] == "IDENTIFY") {
-                isIdentified = userRegister(json_msg, client_socket);  // Llamar a userRegister con el JSON ya parseado
-                if (!isIdentified) {
-                    string username = getData(buffer, "username");
-                    json response = makeIDENTIFY(RESPONSE, username, "USER_ALREADY_EXISTS");
-                    string usr_exist = response.dump();
-                    send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
-                    close(client_socket);
-                }
-            }
-                if(!isIdentified){
-                    json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
-                    sendResponseAndClose(client_socket, response.dump());
-                }
-                string username = getData(buffer, "username");
-                while (true) {
-                    int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
-                    if (bytes_read <= 0) break;
-                    buffer[bytes_read] = '\0';
-                    sendMsg(buffer, username, client_socket);
-                }
-            
-        } catch (const json::parse_error& e) {
+            json_msg = json::parse(buffer);
+        } catch (json::parse_error& e){
+            json response = makeRESPONSE("INVALID", "INVALID");
+            string r_str = response.dump();
+            send(client_socket, r_str.c_str(), r_str.size(), 0);
+            close(client_socket);
+            return;
+        }
+        if(json_msg.at("type") != "IDENTIFY"){
             json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
-            sendResponseAndClose(client_socket, response.dump());
-        }        
+            string usr_exist = response.dump();
+            send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
+            close(client_socket);
+            return;
+        } else{
+            isIdentified = userRegister(json_msg, client_socket);  // Llamar a userRegister con el JSON ya parseado
+            if (!isIdentified) {
+                string username = getData(buffer, "username");
+                json response = makeIDENTIFY(RESPONSE, username, "USER_ALREADY_EXISTS");
+                string usr_exist = response.dump();
+                send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
+                close(client_socket);
+                return;
+            }
+        
+        string username = getData(buffer, "username");
+        while (true) {
+            int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+            if (bytes_read <= 0) break;
+            buffer[bytes_read] = '\0';
+            sendMsg(buffer, username, client_socket);
+        }
+        }
+            
     }
 
 
@@ -106,7 +114,14 @@ bool userRegister(const json& json_msg, int client_socket) {
         // Obtener el nombre de usuario del JSON ya parseado
         string u = json_msg.at("username");
         // Verificar condiciones de registro
-        if (u.size() > 8 || json_msg.at("type") != "IDENTIFY" || u.empty()) {
+        // if(json_msg.at("type") != "IDENTIFY"){
+        //     json response = makeIDENTIFY(RESPONSE, u, "INVALID");
+        //     string usr_exist = response.dump();
+        //     send(client_socket, usr_exist.c_str(), usr_exist.size(), 0);
+        //     close(client_socket);
+        //     return false;
+        // }
+        if (u.size() > 8|| u.empty()) {
             json r = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
             sendResponseAndClose(client_socket, r.dump());
             return false;
