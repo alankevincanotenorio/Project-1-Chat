@@ -65,9 +65,9 @@ public:
         }
     }
     
-    void handleClient(int client_socket) {
+        void handleClient(int client_socket) {
         char buffer[512] = {0};
-        bool isIdentified = false;
+        bool isIdentified = false;  // Indica si el usuario ya está identificado
         int bytes_read = read(client_socket, buffer, 512);
         buffer[bytes_read] = '\0';
         try{
@@ -97,22 +97,37 @@ public:
         } catch (const json::parse_error& e) {
             json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
             sendResponseAndClose(client_socket, response.dump());
-        }           
+        }        
     }
 
-    bool userRegister(const json& json_msg, int client_socket) {
-        string username = json_msg.at("username");
-        if (username.size() > 8 || json_msg.at("type") != "IDENTIFY" || username.empty()) {
-            json response = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
-            sendResponseAndClose(client_socket, response.dump());
+
+
+bool userRegister(const json& json_msg, int client_socket) {
+        // Obtener el nombre de usuario del JSON ya parseado
+        string u = json_msg.at("username");
+        // Verificar condiciones de registro
+        if (u.size() > 8 || json_msg.at("type") != "IDENTIFY" || u.empty()) {
+            json r = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
+            sendResponseAndClose(client_socket, r.dump());
             return false;
         }
-        string user = generalRoom->getUserRegister(user);
-        if (user != "NO_SUCH_USER") return false;
-        json response = makeIDENTIFY(RESPONSE, username, "SUCCESS");
+        // Verificar si el usuario ya está registrado
+        string n = generalRoom->getUserRegister(u);
+        if (n != "NO_SUCH_USER") return false;
+        // Responder con éxito
+        json response = makeIDENTIFY(RESPONSE, u, "SUCCESS");
         send(client_socket, response.dump().c_str(), response.dump().size(), 0);
         generalRoom->addNewClient(client_socket, response.dump());
         return true;
+}
+
+
+
+string getData(char buffer[], string data){
+        string msg(buffer);
+        json msgJ = json::parse(msg);
+        string username = msgJ[data];
+        return username;
     }
 
     //falta manejar el caso en public text que te manden un mensaje vacio
