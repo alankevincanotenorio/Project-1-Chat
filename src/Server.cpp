@@ -177,6 +177,7 @@ public:
     }
 
     // Función para enviar un mensaje a un usuario específico
+        //maybe aca evitar que se mande mensaje a el mismo
     void sendResponseToUser(const string& target_user, const string& message) {
         int target_socket = generalRoom->getUserSocket(target_user);
         if (target_socket != -1) {
@@ -185,6 +186,7 @@ public:
     }
 
     // Función auxiliar para parsear JSON
+    //maybe aca checar si contienen el type
     bool isValidJSON(const char* buffer, json& json_msg) {
         try {
             json_msg = json::parse(buffer);
@@ -196,7 +198,8 @@ public:
 
     void handlePublicText(const json& json_msg, const string& username, int client_socket) {
         string message = json_msg["text"];
-        if (message.empty() || message == "exit") {
+        if (message == "" || message == "exit") {
+            if(message == "") sendErrorResponse(client_socket, "INVALID", "INVALID");
             generalRoom->removeClient(client_socket, username);
             close(client_socket);
             return;
@@ -219,6 +222,12 @@ public:
         string target_user = json_msg["username"];
         string message = json_msg["text"];
         if (generalRoom->isUserInRoom(target_user)) {
+            int target_socket = generalRoom->getUserSocket(target_user);
+            if (target_socket == client_socket) {
+                json response = makeRESPONSE("INVALID", "INVALID");
+                send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+                return;
+            }
             json response = makeTEXT(TEXT_FROM, message, username);
             sendResponseToUser(target_user, response.dump());
         } else {
