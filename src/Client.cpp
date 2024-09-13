@@ -219,7 +219,6 @@ private:
                 string  room_name = input.substr(7);
                 sendMessage(NEW_ROOM, room_name);
             }
-
             else{
                 sendMessage(NONE,input);
             }

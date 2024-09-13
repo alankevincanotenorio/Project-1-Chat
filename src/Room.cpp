@@ -22,12 +22,16 @@ public:
 
     //colocar try catch?
     void addNewClient(int client_socket, const string& success) {
-        json response = json::parse(success);
-        string username = response["extra"];
-        (*clients)[username] = {"ACTIVE", client_socket};
-        json general_msg = makeIDENTIFY(NEW_USER, username);
-        string msg_str = general_msg.dump();
-        sendMsgToRoom(msg_str, client_socket);
+        try{
+            json response = json::parse(success);
+            string username = response["extra"];
+            (*clients)[username] = {"ACTIVE", client_socket};
+            json general_msg = makeIDENTIFY(NEW_USER, username);
+            string msg_str = general_msg.dump();
+            sendMsgToRoom(msg_str, client_socket);
+        } catch (json::parse_error& e){
+            return;
+        }
     }
 
     void removeClient(int client_socket, const string& username) {

@@ -259,8 +259,8 @@ public:
         rooms[roomname] = make_unique<Room>(roomname);
         json response = makeNEWROOM(RESPONSE, roomname, "SUCCESS");
         send(client_socket, response.dump().c_str(), response.dump().size(), 0);
-        //agregar al usuario que creo la sala
-
+        // Agregar al usuario que creó la sala 
+        rooms[roomname]->addNewClient(client_socket, username);
         cout << "Salas actualmente en el servidor:" << endl;
         for (const auto& [room_name, room] : rooms) {
             cout << " - " << room_name << endl;
