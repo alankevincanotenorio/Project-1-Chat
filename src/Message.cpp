@@ -221,3 +221,19 @@ json makeTEXT(MessageType type, const string& message, const string& username = 
     }
     return text;
 }
+
+json makeNEWROOM(MessageType type, const string& roomname, const string& result = "") {
+    json new_room;
+    switch(type) {
+        case NEW_ROOM:
+            new_room["type"] = messageTypeToString(NEW_ROOM);
+            new_room["roomname"] = roomname;
+            break;
+        case RESPONSE:
+            new_room = makeRESPONSE(messageTypeToString(NEW_ROOM), result, roomname);
+            break;
+        default:
+            break;
+    }
+    return new_room;
+}

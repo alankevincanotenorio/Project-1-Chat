@@ -50,10 +50,16 @@ private:
 
     void handleResponse(const json& json_msg) {
         string result = json_msg["result"];
+        string operation = json_msg["operation"];
         if (result == "SUCCESS") {
-            is_identified = true;
-            user_name = json_msg["extra"];
-            cout << "Welcome! " << user_name << " ,now you can send messages." << endl;
+            if(operation == "NEW_ROOM"){
+                cout << "The room " << json_msg["extra"] << "has been created." << endl;
+            }
+            else{
+                is_identified = true;
+                user_name = json_msg["extra"];
+                cout << "Welcome! " << user_name << " ,now you can send messages." << endl;
+            }
         } else if (result == "USER_ALREADY_EXISTS") {
             cout << "Sorry, the username is used by another user." << endl;
             close(sock);
@@ -68,6 +74,10 @@ private:
             exit(0);
         } else if (result == "NO_SUCH_USER") {
             cout << "The user '" << json_msg["extra"] << "' does not exist." << endl;
+            close(sock);
+            exit(0);
+        } else if (result == "ROOM_ALREADY_EXIST") {
+            cout << "The room '" << json_msg["extra"] << "' already exist." << endl;
             close(sock);
             exit(0);
         }
@@ -150,6 +160,9 @@ private:
             case TEXT:
                 json_msg = makeTEXT(type, message, target_user);
                 break;
+            case NEW_ROOM:
+                json_msg = makeNEWROOM(type, message);
+                break;
             default:
                 break;
         }
@@ -190,7 +203,7 @@ private:
                 exit(0);
             }
             //public message
-            else if(input.substr(0, 3) == "pb "){
+            else if (input.substr(0, 3) == "pb ") {
                 string message = input.substr(3);            
                 sendMessage(PUBLIC_TEXT, message);
             } 
@@ -200,7 +213,13 @@ private:
                 string target_user = input.substr(4, spacePos - 4);
                 string private_message = input.substr(spacePos + 1);
                 sendMessage(TEXT, private_message, target_user);
+            } 
+            //make rooms
+            else if (input.substr(0, 7) == "mkRoom ") {
+                string  room_name = input.substr(7);
+                sendMessage(NEW_ROOM, room_name);
             }
+
             else{
                 sendMessage(NONE,input);
             }

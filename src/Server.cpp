@@ -138,7 +138,8 @@ public:
     }
 
     //falta manejar el caso en public text que te manden un mensaje vacio
-    void sendMsg(char buffer[], const string& username, int client_socket) {    
+    void sendMsg(char buffer[], const string& username, int client_socket) {  
+        cout << "Mensaje recibido (raw): " << buffer << endl;  
         json json_msg;
         if(!isValidJSON(buffer, json_msg)){
             sendErrorResponse(client_socket, "INVALID", "INVALID");
@@ -166,6 +167,10 @@ public:
             }
             case TEXT: {
                 handlePrivMessage(json_msg, username, client_socket);
+                break;
+            }
+            case NEW_ROOM: {
+                handleNewRoom(json_msg, username, client_socket);
                 break;
             }
             default: {
@@ -235,6 +240,35 @@ public:
             send(client_socket, response.dump().c_str(), response.dump().size(), 0);
         }
     }
+
+    void handleNewRoom(const json& json_msg, const string& username, int client_socket) {
+        string roomname = json_msg["roomname"];
+        if (roomname.size() > 16|| username.empty()) {
+            json r = makeRESPONSE("INVALID", "INVALID");
+            send(client_socket, r.dump().c_str(), r.dump().size(), 0);
+            close(client_socket);
+            return;
+        }
+        // Verificar si la sala ya existe
+        if (rooms.find(roomname) != rooms.end()) {
+            json response = makeNEWROOM(RESPONSE, roomname, "ROOM_ALREADY_EXISTS");
+            send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+            return;
+        }
+        cout << "Creando la sala: " << roomname << " para el usuario: " << username << endl;
+        rooms[roomname] = make_unique<Room>(roomname);
+        json response = makeNEWROOM(RESPONSE, roomname, "SUCCESS");
+        send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+        //agregar al usuario que creo la sala
+
+        cout << "Salas actualmente en el servidor:" << endl;
+        for (const auto& [room_name, room] : rooms) {
+            cout << " - " << room_name << endl;
+        }
+    }
+
+
+
 
     ~Server() {
         if (server_fd != -1) {
