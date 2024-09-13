@@ -93,7 +93,7 @@ MessageType stringToMessageType(const string& type_str) {
 
 
 
-json makeRESPONSE(string operation, string result, string extra = ""){
+json makeRESPONSE(const string& operation, const string& result, const string& extra = ""){
     json response;
     response["type"] = messageTypeToString(RESPONSE);
     response["operation"] = operation;
@@ -161,7 +161,7 @@ json makeUSERS(MessageType type, const unordered_map<string, string>& users_map 
     return users_list;
 }
 
-json makePublictxt(MessageType type, string message, string username = ""){
+json makePublictxt(MessageType type, const string& message, const string& username = ""){
     json public_txt;
     switch(type){
         case PUBLIC_TEXT:
@@ -179,7 +179,7 @@ json makePublictxt(MessageType type, string message, string username = ""){
     return public_txt;
 }
 
-json makeDISCONNECT(MessageType type, string roomname = "", string username = "") {
+json makeDISCONNECT(MessageType type, const string& roomname = "", const string& username = "") {
     json disconnect;
     switch(type) {
         case DISCONNECT:
@@ -200,7 +200,7 @@ json makeDISCONNECT(MessageType type, string roomname = "", string username = ""
     return disconnect;
 }
 
-json makeTEXT(MessageType type, string message, string username = ""){
+json makeTEXT(MessageType type, const string& message, const string& username = ""){
     json text;
     switch(type){
         case TEXT:

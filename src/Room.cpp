@@ -20,6 +20,7 @@ public:
     //constructor
     Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, ClientData>>()) {}
 
+    //colocar try catch?
     void addNewClient(int client_socket, const string& success) {
         json response = json::parse(success);
         string username = response["extra"];
@@ -29,14 +30,14 @@ public:
         sendMsgToRoom(msg_str, client_socket);
     }
 
-    void removeClient(int client_socket, const string& username) { //el username esta vacio wtf
+    void removeClient(int client_socket, const string& username) {
         // Crear y enviar el mensaje LEFT_ROOM si el usuario está en un cuarto falta implementarlo
         auto it = clients->find(username);
         if (it != clients->end() && it->second.socket_fd == client_socket) {
-            clients->erase(it);
             json disconnected_msg = makeDISCONNECT(DISCONNECTED, username);
             string disconnected_str = disconnected_msg.dump();
             sendMsgToRoom(disconnected_str, client_socket);
+            clients->erase(it);
             close(client_socket);
         }
     }
@@ -88,9 +89,16 @@ public:
 
     int getUserSocket(const string& username) {
         auto it = clients->find(username);
-        if (it != clients->end()) {
-            return it->second.socket_fd;
-        }
-        return -1;
+        return (it != clients->end()) ? it->second.socket_fd : -1;
     }
+
+    string getUsername(int client_socket) const {
+        for (const auto& [username, client_info] : *clients) {
+            if (client_info.socket_fd == client_socket) {
+                return username;
+            }
+        }
+        return "NO_SUCH_USER";
+    }
+
 };
