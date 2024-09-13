@@ -200,7 +200,7 @@ json makeDISCONNECT(MessageType type, const string& roomname = "", const string&
     return disconnect;
 }
 
-json makeTEXT(MessageType type, const string& message, const string& username = ""){
+json makeTEXT(MessageType type, const string& message, const string& username = "") {
     json text;
     switch(type){
         case TEXT:

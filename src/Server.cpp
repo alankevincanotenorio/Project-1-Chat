@@ -16,12 +16,16 @@ private:
     int opt = 1;
     int addrlen = sizeof(address);
     shared_ptr<Room> generalRoom;
-    unique_ptr<unordered_map<string, unique_ptr<Room>>> rooms;
+    unordered_map<string, unique_ptr<Room>> rooms;
 
 public:
     string ipAddress;
     int port;
-    Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {}
+    Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {
+        generalRoom = make_shared<Room>("General");
+        // rooms.emplace("General", make_unique<Room>(*generalRoom));
+    }
+
 
     void initSocket() {
         server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -48,9 +52,6 @@ public:
             close(server_fd);
             return;
         }
-        generalRoom = make_shared<Room>("General");
-        // rooms = make_unique<unordered_map<string, unique_ptr<Room>>>();
-        // rooms->emplace("General", generalRoom);
     }
 
     //connect client method
@@ -87,9 +88,7 @@ public:
         if (bytes_read <= 0) return false;
         buffer[bytes_read] = '\0';
         json json_msg;
-        try {
-            json_msg = json::parse(buffer);
-        } catch (json::parse_error& e) {
+        if(!isValidJSON(buffer, json_msg)){
             sendErrorResponse(client_socket, "INVALID", "INVALID");
             return false;
         }
@@ -121,7 +120,8 @@ public:
         string username = json_msg.at("username");
         if (username.size() > 8|| username.empty()) {
             json r = makeRESPONSE("INVALID", "NOT_IDENTIFIED");
-            sendResponseAndClose(client_socket, r.dump());
+            send(client_socket, r.dump().c_str(), r.dump().size(), 0);
+            close(client_socket);
             return false;
         }
         string user = generalRoom->getUserRegister(username);
@@ -138,16 +138,10 @@ public:
     }
 
     //falta manejar el caso en public text que te manden un mensaje vacio
-    //puede que lo vuelva a refactorizar para que sea menos largo y cumpla el P.R.U
     void sendMsg(char buffer[], const string& username, int client_socket) {    
         json json_msg;
-        try{
-            json_msg = json::parse(buffer);
-        } catch (json::parse_error& e){
-            json response = makeRESPONSE("INVALID", "INVALID");
-            string r_str = response.dump();
-            send(client_socket, r_str.c_str(), r_str.size(), 0);
-            close(client_socket);
+        if(!isValidJSON(buffer, json_msg)){
+            sendErrorResponse(client_socket, "INVALID", "INVALID");
             generalRoom->removeClient(client_socket, username);
             return;
         }
@@ -155,25 +149,11 @@ public:
         MessageType type = stringToMessageType(message_type);
         switch (type) {
             case PUBLIC_TEXT: {
-                string message = json_msg["text"];
-                if (message == "exit" || message == "") { //el caso en que no te envien un mensaje si te desconecta pero no te avisa ni cierra terminal
-                    generalRoom->removeClient(client_socket, username);
-                    close(client_socket);
-                    return;
-                }
-                json response = makePublictxt(PUBLIC_TEXT_FROM, message, username);
-                generalRoom->sendMsgToRoom(response.dump(), client_socket);
+                handlePublicText(json_msg, username, client_socket);
                 break;
             }
             case STATUS: {
-                string new_status = json_msg["status"];
-                if (new_status != "ACTIVE" && new_status != "AWAY" && new_status != "BUSY") {
-                    json invalid_response = makeRESPONSE("INVALID", "INVALID");
-                    sendResponseAndClose(client_socket, invalid_response.dump());
-                    generalRoom->removeClient(client_socket, username);
-                    return;
-                }
-                generalRoom->updateStatus(username, new_status);
+                handleStatusUpdate(json_msg, username, client_socket);
                 break;
             }
             case USERS: {
@@ -185,29 +165,15 @@ public:
                 break;
             }
             case TEXT: {
-                string target_user = json_msg["username"];
-                string message = json_msg["text"];
-                if (generalRoom->isUserInRoom(target_user)) {
-                    json response = makeTEXT(TEXT_FROM, message, username);
-                    sendResponseToUser(target_user, response.dump());
-                } else {
-                    json response = makeTEXT(RESPONSE, target_user);
-                    send(client_socket, response.dump().c_str(), response.dump().size(), 0);
-                }
+                handlePrivMessage(json_msg, username, client_socket);
                 break;
             }
             default: {
-                json invalid_response = makeRESPONSE("INVALID", "INVALID");
-                sendResponseAndClose(client_socket, invalid_response.dump());
+                sendErrorResponse(client_socket, "INVALID", "INVALID");
+                generalRoom->removeClient(client_socket, username);
                 break;
             }
         }
-    }
-
-    // Función para enviar una respuesta y cerrar la conexión
-    void sendResponseAndClose(int client_socket, const string& response) {
-        send(client_socket, response.c_str(), response.size(), 0);
-        close(client_socket);
     }
 
     // Función para enviar un mensaje a un usuario específico
@@ -218,13 +184,58 @@ public:
         }
     }
 
-    //modify
+    // Función auxiliar para parsear JSON
+    bool isValidJSON(const char* buffer, json& json_msg) {
+        try {
+            json_msg = json::parse(buffer);
+            return true;
+        } catch (json::parse_error& e) {
+            return false;
+        }
+    }
+
+    void handlePublicText(const json& json_msg, const string& username, int client_socket) {
+        string message = json_msg["text"];
+        if (message.empty() || message == "exit") {
+            generalRoom->removeClient(client_socket, username);
+            close(client_socket);
+            return;
+        }
+        json response = makePublictxt(PUBLIC_TEXT_FROM, message, username);
+        generalRoom->sendMsgToRoom(response.dump(), client_socket);
+    }
+
+    void handleStatusUpdate(const json& json_msg, const string& username, int client_socket) {
+        string new_status = json_msg["status"];
+        if (new_status != "ACTIVE" && new_status != "AWAY" && new_status != "BUSY") {
+            sendErrorResponse(client_socket, "INVALID", "INVALID");
+            generalRoom->removeClient(client_socket, username);
+            return;
+        }
+        generalRoom->updateStatus(username, new_status);
+    }
+
+    void handlePrivMessage(const json& json_msg, const string& username, int client_socket) {
+        string target_user = json_msg["username"];
+        string message = json_msg["text"];
+        if (generalRoom->isUserInRoom(target_user)) {
+            json response = makeTEXT(TEXT_FROM, message, username);
+            sendResponseToUser(target_user, response.dump());
+        } else {
+            json response = makeTEXT(RESPONSE, "",target_user);
+            send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+        }
+    }
+
     ~Server() {
         if (server_fd != -1) {
-            cout << "Server destroyed" << endl;
-            if (close(server_fd) == -1) {
-                cerr << "Error closing socket: " << strerror(errno) << endl;
+            cout << "Closing server and all client connections..." << endl;
+            for (const auto& [username, client_info] : generalRoom->getClients()) {
+                close(client_info.socket_fd);
             }
+            if (close(server_fd) == -1) {
+                cerr << "Error closing server socket: " << strerror(errno) << endl;
+            } else cout << "Server closed successfully" << endl;
         }
     }
 

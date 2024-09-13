@@ -34,7 +34,7 @@ public:
         // Crear y enviar el mensaje LEFT_ROOM si el usuario está en un cuarto falta implementarlo
         auto it = clients->find(username);
         if (it != clients->end() && it->second.socket_fd == client_socket) {
-            json disconnected_msg = makeDISCONNECT(DISCONNECTED, username);
+            json disconnected_msg = makeDISCONNECT(DISCONNECTED, "",username);
             string disconnected_str = disconnected_msg.dump();
             sendMsgToRoom(disconnected_str, client_socket);
             clients->erase(it);
@@ -101,4 +101,7 @@ public:
         return "NO_SUCH_USER";
     }
 
+    const unordered_map<string, ClientData>& getClients() const {
+        return *clients;
+    }
 };
