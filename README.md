@@ -1,3 +1,6 @@
+Nombre: Alan Kevin Cano Tenorio 
+Número de cuenta: 321259967.
+
 # Chat Cliente-Servidor en C++
 
 Este proyecto es una implementación de un sistema de chat cliente-servidor en C++ que permite a los usuarios conectarse a un servidor de chat, enviar mensajes públicos y privados, crear salas y ver listas de usuarios en tiempo real. Está construido utilizando las herramientas Meson y Ninja para la configuración y construcción, y Google Test (gtest) para las pruebas unitarias.
