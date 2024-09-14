@@ -179,7 +179,6 @@ private:
                 buffer[bytes_read] = '\0';
                 string received(buffer);
                 if (received.front() == '{' && received.back() == '}') {
-                    cout << "Mensaje recibido JSON: " << received << endl;
                     json json_msg = json::parse(received);
                     handleMessageType(json_msg);
                 }
@@ -219,7 +218,7 @@ private:
                 break;
             case NEW_ROOM:
                 json_msg = makeNEWROOM(type, message);
-                break; //agregar invite
+                break;
             default:
                 break;
         }
@@ -261,7 +260,7 @@ private:
             else if (input == "exit") {
                 sendMessage(DISCONNECT, "");
                 close(sock);
-                cout << "Te has desconectado del servidor." << endl;
+                cout << "Disconnected" << endl;
                 exit(0);
             }
             //public message
@@ -299,7 +298,6 @@ private:
                     json_msg["roomname"] = room_name;
                     json_msg["usernames"] = users_invit;
                     send(sock, json_msg.dump().c_str(), json_msg.dump().size(), 0);
-                    cout << "Mensaje enviado json: " << json_msg.dump() << endl;
                 }
             } 
             else{

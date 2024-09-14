@@ -23,7 +23,6 @@ public:
     int port;
     Server(string ipAddress, int port) : ipAddress(ipAddress), port(port) {
         generalRoom = make_shared<Room>("General");
-        // rooms.emplace("General", make_unique<Room>(*generalRoom));
     }
 
 

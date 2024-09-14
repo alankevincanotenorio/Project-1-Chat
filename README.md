@@ -63,3 +63,10 @@ Crea una nueva sala de chat con el nombre especificado.
 
 Invitar a usuarios a una sala: invt <nombre_de_la_sala> <usuario1,usuario2,...>
 Invita a uno o más usuarios a unirse a una sala de chat existente.
+
+
+NOTAS:
+No documente el servidor porque se me paso el tiempo
+No implemente todo el protocolo, faltaron las partes de: JOIN_ROOM, ROOM_USERS, ROOM_TEXT, LEAVE_ROOM y LEFT_ROOM de DISCONNECTED
+Olvide eliminar todo lo relacionado a las pruebas unitarias
+Olvide eliminar las impresiones de depuracion del cliente
