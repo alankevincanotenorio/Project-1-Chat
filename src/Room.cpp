@@ -8,9 +8,16 @@
 using json = nlohmann::json;
 using namespace std;
 
+/**
+ * @brief Represents a chat room that manages connected clients and their interactions.
+ */
 class Room {
 private:
     string name;
+
+    /**
+    * @brief Stores information about a connected client.
+    */
     struct ClientData {
         string status;
         int socket_fd;
@@ -19,9 +26,19 @@ private:
     unordered_set<string> invited_users;
 
 public:
-    //constructor
+    /**
+     * @brief Constructor that initializes a room with a given name.
+     * 
+     * @param roomName The name of the room.
+     */
     Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, ClientData>>()) {}
 
+    /**
+     * @brief Adds a new client to the room.
+     * 
+     * @param client_socket The socket file descriptor of the client.
+     * @param username The username of the client.
+     */
     void addNewClient(int client_socket, const string& username) {
         (*clients)[username] = {"ACTIVE", client_socket};
         json general_msg = makeIDENTIFY(NEW_USER, username);
@@ -29,8 +46,13 @@ public:
         sendMsgToRoom(msg_str, client_socket);
     }
 
+     /**
+     * @brief Removes a client from the room.
+     * 
+     * @param client_socket The socket file descriptor of the client.
+     * @param username The username of the client.
+     */
     void removeClient(int client_socket, const string& username) {
-        // Crear y enviar el mensaje LEFT_ROOM si el usuario está en un cuarto falta implementarlo
         auto it = clients->find(username);
         if (it != clients->end() && it->second.socket_fd == client_socket) {
             json disconnected_msg = makeDISCONNECT(DISCONNECTED, "",username);
@@ -41,6 +63,12 @@ public:
         }
     }
 
+    /**
+     * @brief Sends a message to all clients in the room, except the sender.
+     * 
+     * @param message The message to send.
+     * @param socket_sender The socket file descriptor of the client sending the message.
+     */
     void sendMsgToRoom(const string& message, int socket_sender) {
         string msg = message;
         for (const auto& [username, client_info] : *clients) {
@@ -49,6 +77,12 @@ public:
         }
     }
 
+    /**
+     * @brief Updates the status of a client in the room.
+     * 
+     * @param username The username of the client.
+     * @param new_status The new status to set for the client.
+     */
     void updateStatus(const string& username, const string& new_status) {
         auto it = clients->find(username);
         if (it != clients->end()) {
@@ -59,6 +93,11 @@ public:
         }
     }
 
+    /**
+     * @brief Sends the list of users in the room to a specific client.
+     * 
+     * @param client_socket The socket file descriptor of the client requesting the list.
+     */
     void sendUserList(int client_socket) {
         unordered_map<string, string> users;
         for (const auto& [username, client_info] : *clients) {
@@ -69,28 +108,54 @@ public:
         send(client_socket, user_list_str.c_str(), user_list_str.size(), 0);
     }
 
+    /**
+     * @brief Checks if a user is in the room.
+     * 
+     * @param username The username to check.
+     * @return True if the user is in the room, false otherwise.
+     */
     bool isUserInRoom(const string& username) {
         return clients->find(username) != clients->end();
     }
 
+    /**
+     * @brief Gets the registration information of a user.
+     * 
+     * @param user The username to check.
+     * @return The username if found, otherwise "NO_SUCH_USER".
+     */
     string getUserRegister(const string& user) const {
         auto it = clients->find(user);
         return (it != clients->end()) ? it->first : "NO_SUCH_USER";
     }
 
+    /**
+     * @brief Gets the status of a user.
+     * 
+     * @param username The username whose status is requested.
+     * @return The status of the user.
+     */
     string getStatus(const string& username){
         return (*clients)[username].status;
     }
 
-    string getName() const {
-        return name;
-    }
-
+    /**
+     * @brief Gets the socket file descriptor of a user.
+     * 
+     * @param username The username whose socket is requested.
+     * @return The socket file descriptor if the user is found, otherwise -1.
+     */
     int getUserSocket(const string& username) {
         auto it = clients->find(username);
         return (it != clients->end()) ? it->second.socket_fd : -1;
     }
 
+    /**
+     * @brief Gets the username associated with a given socket.
+     * 
+     * @param client_socket The socket file descriptor to check.
+     * @return The username if found, otherwise "NO_SUCH_USER".
+     */
     string getUsername(int client_socket) const {
         for (const auto& [username, client_info] : *clients) {
             if (client_info.socket_fd == client_socket) {
@@ -100,17 +165,30 @@ public:
         return "NO_SUCH_USER";
     }
 
+    /**
+     * @brief Gets a constant reference to the map of clients in the room.
+     * 
+     * @return A constant reference to the unordered map of clients.
+     */
     const unordered_map<string, ClientData>& getClients() const {
         return *clients;
     }
 
-
-       // Agregar un usuario a la lista de invitados
-    void addInvitee(const string& username) {
+    /**
+     * @brief Adds a user to the list of invited users.
+     * 
+     * @param username The username of the user to invite.
+     */
+    void addUsersInvited(const string& username) {
         invited_users.insert(username);
     }
 
-    // Verificar si un usuario ya fue invitado
+    /**
+     * @brief Checks if a user has been invited to the room.
+     * 
+     * @param username The username to check.
+     * @return True if the user has been invited, false otherwise.
+     */
     bool isUserInvited(const string& username) const {
         return invited_users.find(username) != invited_users.end();
     }

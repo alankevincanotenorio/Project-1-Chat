@@ -4,7 +4,10 @@
 using json = nlohmann::json;
 using namespace std;
 
-//all the types of message that the protocol use
+/**
+ * @brief Enumeration of all types of messages that the protocol uses
+ * NONE is not used in the protcol but is used for message with no type
+ */
 enum MessageType{
     IDENTIFY,
     RESPONSE,
@@ -33,6 +36,12 @@ enum MessageType{
     NONE
 };
 
+/**
+ * @brief Converts a MessageType enum value to its string representation.
+ * 
+ * @param type The MessageType enum value to convert.
+ * @return The string representation of the provided MessageType.
+ */
 string messageTypeToString(MessageType type) {
     switch (type) {
         case IDENTIFY: return "IDENTIFY";
@@ -63,6 +72,12 @@ string messageTypeToString(MessageType type) {
     }
 }
 
+/**
+ * @brief Converts a string to its corresponding MessageType enum value.
+ * 
+ * @param type_str The string representation of the MessageType.
+ * @return The MessageType enum value corresponding to the input string. Returns NONE if no match is found.
+ */
 MessageType stringToMessageType(const string& type_str) {
     if (type_str == "IDENTIFY") return IDENTIFY;
     else if (type_str == "RESPONSE") return RESPONSE;
@@ -88,11 +103,17 @@ MessageType stringToMessageType(const string& type_str) {
     else if (type_str == "LEFT_ROOM") return LEFT_ROOM;
     else if (type_str == "DISCONNECT") return DISCONNECT;
     else if (type_str == "DISCONNECTED") return DISCONNECTED;
-    return NONE;  // Tipo de mensaje desconocido
+    return NONE;
 }
 
-
-
+/**
+ * @brief Creates a response message in JSON format.
+ * 
+ * @param operation The operation associated with the response.
+ * @param result The result of the operation.
+ * @param extra (Optional) additional information.
+ * @return A JSON object representing the response message.
+ */
 json makeRESPONSE(const string& operation, const string& result, const string& extra = ""){
     json response;
     response["type"] = messageTypeToString(RESPONSE);
@@ -103,6 +124,14 @@ json makeRESPONSE(const string& operation, const string& result, const string& e
     return response;
 }
 
+/**
+ * @brief Creates an identification message in JSON format.
+ * 
+ * @param type The type of identification message.
+ * @param username The username associated with the identification.
+ * @param result (Optional) result parameter used if the type is RESPONSE.
+ * @return A JSON object representing the identification message.
+ */
 json makeIDENTIFY(MessageType type, const string& username, const string& result = "") {
     json id_json;
     switch(type) {
@@ -123,24 +152,39 @@ json makeIDENTIFY(MessageType type, const string& username, const string& result
     return id_json;
 }
 
-json makeSTATUS(MessageType type, const string& result, const string& username = "") {
-    json status;
+/**
+ * @brief Creates a status message in JSON format.
+ * 
+ * @param type The type of status message.
+ * @param status The status.
+ * @param username (Optional) username associated with the status.
+ * @return A JSON object representing the status message.
+ */
+json makeSTATUS(MessageType type, const string& status, const string& username = "") {
+    json status_json;
     switch(type) {
         case STATUS:
-            status["type"] = messageTypeToString(STATUS);
-            status["status"] = result;
+            status_json["type"] = messageTypeToString(STATUS);
+            status_json["status"] = status;
             break;
         case NEW_STATUS:
-            status["type"] = messageTypeToString(NEW_STATUS);
-            status["username"] = username;
-            status["status"] = result;
+            status_json["type"] = messageTypeToString(NEW_STATUS);
+            status_json["username"] = username;
+            status_json["status"] = status;
             break;
         default:
             break;
     }
-    return status;
+    return status_json;
 }
 
+/**
+ * @brief Creates a user list or user list request message in JSON format.
+ * 
+ * @param type The type of users message.
+ * @param users_map (Optional) map of usernames with their statuses.
+ * @return A JSON object representing the users list message or user list request.
+ */
 json makeUSERS(MessageType type, const unordered_map<string, string>& users_map = {}) {
     json users_list;
     json users_json;
@@ -161,6 +205,14 @@ json makeUSERS(MessageType type, const unordered_map<string, string>& users_map 
     return users_list;
 }
 
+/**
+ * @brief Creates a public text message in JSON format.
+ * 
+ * @param type The type of public text message
+ * @param message The content of the text message.
+ * @param username (Optional) username associated with the message.
+ * @return A JSON object representing the public text message.
+ */
 json makePublictxt(MessageType type, const string& message, const string& username = ""){
     json public_txt;
     switch(type){
@@ -179,6 +231,14 @@ json makePublictxt(MessageType type, const string& message, const string& userna
     return public_txt;
 }
 
+/**
+ * @brief Creates a disconnect or room-leaving message in JSON format.
+ * 
+ * @param type The type of disconnect message
+ * @param roomname (Optional) name of the room you are leaving
+ * @param username (Optional) username associated with the disconnect case.
+ * @return A JSON object representing the disconnect message.
+ */
 json makeDISCONNECT(MessageType type, const string& roomname = "", const string& username = "") {
     json disconnect;
     switch(type) {
@@ -200,6 +260,14 @@ json makeDISCONNECT(MessageType type, const string& roomname = "", const string&
     return disconnect;
 }
 
+/**
+ * @brief Creates a text message in JSON format.
+ * 
+ * @param type The type of text message
+ * @param message The content of the text message.
+ * @param username (Optional) username associated with the message.
+ * @return A JSON object representing the text message.
+ */
 json makeTEXT(MessageType type, const string& message, const string& username = "") {
     json text;
     switch(type){
@@ -222,6 +290,14 @@ json makeTEXT(MessageType type, const string& message, const string& username = 
     return text;
 }
 
+/**
+ * @brief Creates a new room message in JSON format.
+ * 
+ * @param type The type of room message.
+ * @param roomname The name of the room to be created.
+ * @param result (Optional) result used if the type is RESPONSE.
+ * @return A JSON object representing the new room message.
+ */
 json makeNEWROOM(MessageType type, const string& roomname, const string& result = "") {
     json new_room;
     switch(type) {
@@ -238,7 +314,17 @@ json makeNEWROOM(MessageType type, const string& roomname, const string& result 
     return new_room;
 }
 
-
+/**
+ * @brief Creates an invitation message in JSON format.
+ * 
+ * @param type The type of invite message.
+ * @param roomname The name of the room for the invitation.
+ * @param usernames A list of usernames being invited.
+ * @param username (Optional) username associated with the invitation, used if the type is INVITATION or RESPONSE.
+ * @return A JSON object representing the invitation message.
+ * 
+ * @note In the case of INVITE, the list of usernames is used, but for INVITATION and RESPONSE, only the optional username parameter is relevant.
+ */
 json jsonmakeINVITE(MessageType type, const string& roomname, const vector<string>& usernames, const string& username = "") {
     json invitation;
     switch(type){

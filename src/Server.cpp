@@ -304,7 +304,7 @@ public:
                 cout << "Usuario " << invitee << " ya está en la sala " << roomname << ", ignorando invitación." << endl;
                 continue;
             }
-            rooms[roomname]->addInvitee(invitee);
+            rooms[roomname]->addUsersInvited(invitee);
             json invitation = jsonmakeINVITE(INVITATION, roomname, {}, username);
             int target_socket = generalRoom->getUserSocket(invitee);
             if (target_socket != -1) {
