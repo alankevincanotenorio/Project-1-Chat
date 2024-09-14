@@ -8,6 +8,9 @@
 #include "Message.cpp"
 using namespace std;
 
+/**
+ * @brief Represents a clientt
+ */
 class Client {
 private:
     int sock = 0;
@@ -17,6 +20,10 @@ private:
     unique_ptr <thread> receiveThread;
     bool is_identified = false;
 
+    /** 
+     * Handles the received JSON message based on its type.
+     * @param json_msg: The received JSON message.
+     */
     void handleMessageType(const json& json_msg) {
         string message_type_str = json_msg["type"];
         MessageType message_type = stringToMessageType(message_type_str);
@@ -51,6 +58,10 @@ private:
         }
     }
 
+    /**
+     * Handles server responses and updates the client status.
+     * @param json_msg: JSON message containing the response.
+     */
     void handleResponse(const json& json_msg) {
         string result = json_msg["result"];
         string operation = json_msg["operation"];
@@ -87,17 +98,29 @@ private:
         }
     }
 
+    /**
+     * Handles a new user connection message from the server.
+     * @param json_msg: JSON message containing the new user's information.
+     */
     void handleNewUser(const json& json_msg) {
         string new_user = json_msg["username"];
         cout << new_user << " has been connected." << endl;
     }
 
+    /**
+     * Handles a status update from the server.
+     * @param json_msg: JSON message containing the user's status update.
+     */
     void handleStatusUpdate(const json& json_msg) {
         string new_status = json_msg["status"];
         string username = json_msg["username"];
         cout << username << " updated its status to: " << new_status << endl;
     }
 
+    /**
+     * Handles the list of users in the room.
+     * @param json_msg: JSON message containing the list of users.
+     */
     void handleUserList(const json& json_msg) {
         json users_json = json_msg["users"];
         cout << "Users in this room:" << endl;
@@ -106,30 +129,48 @@ private:
         }
     }
 
+    /**
+     * Handles a private message received from another user.
+     * @param json_msg: JSON message containing the private message.
+     */
     void handlePrivateMessage(const json& json_msg) {
         string text = json_msg["text"];
         string from_user = json_msg["username"];
         cout << "Private message from " << from_user << ": " << text << endl;
     }
 
+     /**
+     * Handles a public message received in the chat.
+     * @param json_msg: JSON message containing the public message.
+     */
     void handlePublicMessage(const json& json_msg) {
         string text = json_msg["text"];
         string username = json_msg["username"];
         cout << username << ": " << text << endl;
     }
 
+    /**
+     * Handles a disconnection message from a user.
+     * @param json_msg: JSON message containing the disconnection notice.
+     */
     void handleDisconnection(const json& json_msg) {
         string username = json_msg["username"];
         cout << username << " has been disconnected." << endl;
     }
 
+    /**
+     * Handles an invitation message to join a room.
+     * @param json_msg: JSON message containing the invitation.
+     */
     void handleInvitation(const json& json_msg) {
         string roomname = json_msg["roomname"];
         string username = json_msg["username"];
         cout << username << " invited  you to join to the room " << roomname << endl;
     }
 
-    //readMessages
+    /**
+     * Reads incoming messages from the server in a loop.
+     */
     void receiveMessages() {
         char buffer[512] = {0};
         while (true) {
@@ -149,6 +190,12 @@ private:
         }
     }
 
+    /**
+     * Constructs and sends a message to the server.
+     * @param type: The type of message to send.
+     * @param message: The content of the message.
+     * @param target_user: The target user (for private messages).
+     */
     void sendMessage(MessageType type, const string& message, const string& target_user = "") {
         json json_msg;
         switch (type) {
@@ -189,7 +236,12 @@ private:
         } 
     }
 
-    //maybe tener una enum o una clase commands
+    
+    /**
+     * Parses and handles user commands.
+     * @param input: The user input to process.
+     * @param username: (Optional) Username for certain commands.
+     */
     void checkCommand(const string& input, string username = "") {
         //id
         if (input.substr(0, 3) == "id ") {
@@ -262,6 +314,9 @@ public:
 
     Client(const string &server_ip, int port) : server_ip(server_ip), server_port(port) {}
 
+    /**
+     * Connect with the server
+     */
     int connectToServer() {
         sock = socket(AF_INET, SOCK_STREAM, 0);
         serv_addr.sin_family = AF_INET;
@@ -276,6 +331,9 @@ public:
         return 0;
     }
 
+    /**
+     * Handle the connection
+     */
     void connection() {
         cout << "Hello, please insert your username (max. 8 characters)" << endl;
         string input;
