@@ -228,10 +228,8 @@ private:
             if (type == PUBLIC_TEXT) {
                 cout << user_name << ": " << message << endl;
             }
-            cout << "Mensaje enviado json: " << msg << endl;
         } else{
             send(sock, message.c_str(), message.size(), 0);
-            cout << "Mensaje no json: " << message << endl;
         } 
     }
 
