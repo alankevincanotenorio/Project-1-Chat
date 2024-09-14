@@ -237,3 +237,26 @@ json makeNEWROOM(MessageType type, const string& roomname, const string& result 
     }
     return new_room;
 }
+
+
+json jsonmakeINVITE(MessageType type, const string& roomname, const vector<string>& usernames, const string& username = "") {
+    json invitation;
+    switch(type){
+        case INVITE:
+            invitation["type"] = messageTypeToString(INVITE);
+            invitation["roomname"] = roomname;
+            invitation["usernames"] = username;
+            break;
+        case INVITATION:
+            invitation["type"] = messageTypeToString(INVITATION);
+            invitation["username"] = username;
+            invitation["roomname"] = roomname;
+            break;
+        case RESPONSE:
+            invitation = makeRESPONSE(messageTypeToString(TEXT), "NO_SUCH_USER", username);
+            break;
+        default:
+            break;
+    }
+    return invitation;
+}

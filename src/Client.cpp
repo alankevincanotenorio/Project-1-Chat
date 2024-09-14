@@ -42,6 +42,9 @@ private:
             case DISCONNECTED:
                 handleDisconnection(json_msg);
                 break;
+            case INVITATION:
+                handleInvitation(json_msg);
+                break;
             default:
                 cout << "Unrecognized message: " << message_type_str << endl;
                 break;
@@ -53,7 +56,7 @@ private:
         string operation = json_msg["operation"];
         if (result == "SUCCESS") {
             if(operation == "NEW_ROOM"){
-                cout << "The room " << json_msg["extra"] << "has been created." << endl;
+                cout << "The room " << json_msg["extra"] << " has been created." << endl;
             }
             else{
                 is_identified = true;
@@ -74,12 +77,13 @@ private:
             exit(0);
         } else if (result == "NO_SUCH_USER") {
             cout << "The user '" << json_msg["extra"] << "' does not exist." << endl;
-            close(sock);
-            exit(0);
         } else if (result == "ROOM_ALREADY_EXIST") {
             cout << "The room '" << json_msg["extra"] << "' already exist." << endl;
             close(sock);
             exit(0);
+        } else if (result == "NO_SUCH_ROOM") {
+            string roomname = json_msg["extra"];
+            cout << roomname << " does not exist" << endl;
         }
     }
 
@@ -117,6 +121,12 @@ private:
     void handleDisconnection(const json& json_msg) {
         string username = json_msg["username"];
         cout << username << " has been disconnected." << endl;
+    }
+
+    void handleInvitation(const json& json_msg) {
+        string roomname = json_msg["roomname"];
+        string username = json_msg["username"];
+        cout << username << " invited  you to join to the room " << roomname << endl;
     }
 
     //readMessages
@@ -162,7 +172,7 @@ private:
                 break;
             case NEW_ROOM:
                 json_msg = makeNEWROOM(type, message);
-                break;
+                break; //agregar invite
             default:
                 break;
         }
@@ -219,6 +229,27 @@ private:
                 string  room_name = input.substr(7);
                 sendMessage(NEW_ROOM, room_name);
             }
+            // invite
+            else if (input.substr(0, 5) == "invt ") {
+                size_t spacePos = input.find(" ", 5);
+                if (spacePos != string::npos) {
+                    string room_name = input.substr(5, spacePos - 5);
+                    string usernames = input.substr(spacePos + 1);
+                    vector<string> users_invit;
+                    size_t pos = 0;
+                    while ((pos = usernames.find(",")) != string::npos) {
+                        users_invit.push_back(usernames.substr(0, pos));
+                        usernames.erase(0, pos + 1);
+                    }
+                    users_invit.push_back(usernames);
+                    json json_msg;
+                    json_msg["type"] = messageTypeToString(INVITE);
+                    json_msg["roomname"] = room_name;
+                    json_msg["usernames"] = users_invit;
+                    send(sock, json_msg.dump().c_str(), json_msg.dump().size(), 0);
+                    cout << "Mensaje enviado json: " << json_msg.dump() << endl;
+                }
+            } 
             else{
                 sendMessage(NONE,input);
             }

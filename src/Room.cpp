@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <memory>
 #include "../libs/json.hpp"
@@ -15,23 +16,17 @@ private:
         int socket_fd;
     };
     unique_ptr<unordered_map<string, ClientData>> clients;
+    unordered_set<string> invited_users;
 
 public:
     //constructor
     Room(const string& roomName) : name(roomName), clients(make_unique<unordered_map<string, ClientData>>()) {}
 
-    //colocar try catch?
-    void addNewClient(int client_socket, const string& success) {
-        try{
-            json response = json::parse(success);
-            string username = response["extra"];
-            (*clients)[username] = {"ACTIVE", client_socket};
-            json general_msg = makeIDENTIFY(NEW_USER, username);
-            string msg_str = general_msg.dump();
-            sendMsgToRoom(msg_str, client_socket);
-        } catch (json::parse_error& e){
-            return;
-        }
+    void addNewClient(int client_socket, const string& username) {
+        (*clients)[username] = {"ACTIVE", client_socket};
+        json general_msg = makeIDENTIFY(NEW_USER, username);
+        string msg_str = general_msg.dump();
+        sendMsgToRoom(msg_str, client_socket);
     }
 
     void removeClient(int client_socket, const string& username) {
@@ -107,5 +102,16 @@ public:
 
     const unordered_map<string, ClientData>& getClients() const {
         return *clients;
+    }
+
+
+       // Agregar un usuario a la lista de invitados
+    void addInvitee(const string& username) {
+        invited_users.insert(username);
+    }
+
+    // Verificar si un usuario ya fue invitado
+    bool isUserInvited(const string& username) const {
+        return invited_users.find(username) != invited_users.end();
     }
 };

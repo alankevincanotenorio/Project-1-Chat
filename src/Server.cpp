@@ -85,6 +85,7 @@ public:
     bool identifyClient(int client_socket) {
         char buffer[512] = {0};
         int bytes_read = read(client_socket, buffer, 512);
+        cout << buffer << endl;
         if (bytes_read <= 0) return false;
         buffer[bytes_read] = '\0';
         json json_msg;
@@ -103,6 +104,7 @@ public:
     bool processClientMessage(int client_socket, const string& username) {
         char buffer[512] = {0};
         int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+        cout << buffer << endl;
         if (bytes_read <= 0) return false;
         buffer[bytes_read] = '\0';
         sendMsg(buffer, username, client_socket);
@@ -133,11 +135,11 @@ public:
         }
         json response = makeIDENTIFY(RESPONSE, username, "SUCCESS");
         send(client_socket, response.dump().c_str(), response.dump().size(), 0);
-        generalRoom->addNewClient(client_socket, response.dump());
+        generalRoom->addNewClient(client_socket, username);
         return true;
     }
 
-    //falta manejar el caso en public text que te manden un mensaje vacio
+    
     void sendMsg(char buffer[], const string& username, int client_socket) {  
         cout << "Mensaje recibido (raw): " << buffer << endl;  
         json json_msg;
@@ -173,6 +175,10 @@ public:
                 handleNewRoom(json_msg, username, client_socket);
                 break;
             }
+            case INVITE: {
+                handleInvite(json_msg, username, client_socket);
+                break;
+            }
             default: {
                 sendErrorResponse(client_socket, "INVALID", "INVALID");
                 generalRoom->removeClient(client_socket, username);
@@ -182,7 +188,7 @@ public:
     }
 
     // Función para enviar un mensaje a un usuario específico
-        //maybe aca evitar que se mande mensaje a el mismo
+    //maybe aca evitar que se mande mensaje a el mismo
     void sendResponseToUser(const string& target_user, const string& message) {
         int target_socket = generalRoom->getUserSocket(target_user);
         if (target_socket != -1) {
@@ -225,6 +231,11 @@ public:
 
     void handlePrivMessage(const json& json_msg, const string& username, int client_socket) {
         string target_user = json_msg["username"];
+        if (target_user.empty()) {
+            json response = makeRESPONSE("INVALID", "INVALID");
+            send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+            return;
+        }
         string message = json_msg["text"];
         if (generalRoom->isUserInRoom(target_user)) {
             int target_socket = generalRoom->getUserSocket(target_user);
@@ -243,13 +254,12 @@ public:
 
     void handleNewRoom(const json& json_msg, const string& username, int client_socket) {
         string roomname = json_msg["roomname"];
-        if (roomname.size() > 16|| username.empty()) {
+        if (roomname.size() > 16|| roomname.empty()) {
             json r = makeRESPONSE("INVALID", "INVALID");
             send(client_socket, r.dump().c_str(), r.dump().size(), 0);
             close(client_socket);
             return;
         }
-        // Verificar si la sala ya existe
         if (rooms.find(roomname) != rooms.end()) {
             json response = makeNEWROOM(RESPONSE, roomname, "ROOM_ALREADY_EXISTS");
             send(client_socket, response.dump().c_str(), response.dump().size(), 0);
@@ -259,7 +269,6 @@ public:
         rooms[roomname] = make_unique<Room>(roomname);
         json response = makeNEWROOM(RESPONSE, roomname, "SUCCESS");
         send(client_socket, response.dump().c_str(), response.dump().size(), 0);
-        // Agregar al usuario que creó la sala 
         rooms[roomname]->addNewClient(client_socket, username);
         cout << "Salas actualmente en el servidor:" << endl;
         for (const auto& [room_name, room] : rooms) {
@@ -268,7 +277,38 @@ public:
     }
 
 
-
+    void handleInvite(const json& json_msg, const string& username, int client_socket) {
+        string roomname = json_msg["roomname"];
+        if (!json_msg.contains("usernames") || !json_msg["usernames"].is_array() || roomname.empty() || json_msg["usernames"].empty()) {
+            json response = makeRESPONSE("INVITE", "INVALID");
+            send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+            return;
+        }
+        vector<string> invitees = json_msg["usernames"].get<vector<string>>();
+        if (rooms.find(roomname) == rooms.end()) {
+            json response = makeRESPONSE("INVITE", "NO_SUCH_ROOM", roomname);
+            send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+            return;
+        }
+        for (const auto& invitee : invitees) {
+            if (!generalRoom->isUserInRoom(invitee)) {
+                json response = makeRESPONSE("INVITE", "NO_SUCH_USER", invitee);
+                send(client_socket, response.dump().c_str(), response.dump().size(), 0);
+                return;
+            }
+            if (rooms[roomname]->isUserInRoom(invitee) || rooms[roomname]->isUserInvited(invitee)) {
+                cout << "Usuario " << invitee << " ya está en la sala " << roomname << ", ignorando invitación." << endl;
+                continue;
+            }
+            rooms[roomname]->addInvitee(invitee);
+            json invitation = jsonmakeINVITE(INVITATION, roomname, {}, username);
+            int target_socket = generalRoom->getUserSocket(invitee);
+            if (target_socket != -1) {
+                send(target_socket, invitation.dump().c_str(), invitation.dump().size(), 0);
+                cout << "Invitación enviada a " << invitee << " para unirse a la sala " << roomname << endl;
+            }
+        }
+    }
 
     ~Server() {
         if (server_fd != -1) {
